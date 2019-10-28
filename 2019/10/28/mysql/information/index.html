@@ -42,23 +42,25 @@
     path: '',
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
-      copy_button: 'Kopieren',
-      copy_success: 'Kopiert',
-      copy_failure: 'Kopieren fehlgeschlagen'
+      copy_button: 'Copiar',
+      copy_success: 'Copiado',
+      copy_failure: 'Copiar falló'
     },
     sidebarPadding: 40
   };
 </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="mysql information_schema">
-<meta property="og:url" content="http:&#x2F;&#x2F;lystrosaurus.github.com&#x2F;2019&#x2F;10&#x2F;28&#x2F;mysql&#x2F;mysql-information-schema&#x2F;index.html">
+  <meta name="description" content="mysql 查询表信息12345select * from information_schema.tables where table_name = &amp;apos;?&amp;apos;;use table_schema;desc table_name;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="page">
+<meta property="og:url" content="http:&#x2F;&#x2F;lystrosaurus.github.com&#x2F;2019&#x2F;10&#x2F;28&#x2F;mysql&#x2F;information&#x2F;index.html">
 <meta property="og:site_name" content="Fatty">
+<meta property="og:description" content="mysql 查询表信息12345select * from information_schema.tables where table_name = &amp;apos;?&amp;apos;;use table_schema;desc table_name;">
 <meta property="og:locale" content="zh-cn">
-<meta property="og:updated_time" content="2019-10-28T02:54:09.988Z">
+<meta property="og:updated_time" content="2019-10-28T03:02:34.878Z">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://lystrosaurus.github.com/2019/10/28/mysql/mysql-information-schema/">
+<link rel="canonical" href="http://lystrosaurus.github.com/2019/10/28/mysql/information/">
 
 
 <script id="page-configurations">
@@ -72,7 +74,7 @@
   };
 </script>
 
-  <title>mysql information_schema | Fatty</title>
+  <title>page | Fatty</title>
   
 
 
@@ -125,7 +127,7 @@
   </div>
 
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Navigationsleiste an/ausschalten">
+    <div class="toggle" aria-label="Cambiar a barra de navegación">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -139,12 +141,12 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Startseite</a>
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Inicio</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archiv</a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archivo</a>
 
   </li>
   </ul>
@@ -173,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-cn">
-    <link itemprop="mainEntityOfPage" href="http://lystrosaurus.github.com/2019/10/28/mysql/mysql-information-schema/">
+    <link itemprop="mainEntityOfPage" href="http://lystrosaurus.github.com/2019/10/28/mysql/information/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://s.gravatar.com/avatar/55ac842932bc1e3ed5f9cd30bd7ef25e?s=80">
@@ -186,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          mysql information_schema
+          page
         </h1>
 
         <div class="post-meta">
@@ -194,10 +196,10 @@
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
               </span>
-              <span class="post-meta-item-text">Veröffentlicht am</span>
+              <span class="post-meta-item-text">Publicado el</span>
               
 
-              <time title="Erstellt: 2019-10-28 10:52:20 / Geändert am: 10:54:09" itemprop="dateCreated datePublished" datetime="2019-10-28T10:52:20+08:00">2019-10-28</time>
+              <time title="Creado por: 2019-10-28 11:01:45 / Modificado por: 11:02:34" itemprop="dateCreated datePublished" datetime="2019-10-28T11:01:45+08:00">2019-10-28</time>
             </span>
 
           
@@ -211,7 +213,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h2 id="mysql-查询表信息"><a href="#mysql-查询表信息" class="headerlink" title="mysql 查询表信息"></a>mysql 查询表信息</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> information_schema.tables <span class="keyword">where</span> table_name = <span class="string">'?'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> table_schema;</span><br><span class="line"></span><br><span class="line">desc table_name;</span><br></pre></td></tr></table></figure>
+
     </div>
 
     
@@ -261,15 +264,16 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Inhaltsverzeichnis
+          Tabla de contenidos
         </li>
         <li class="sidebar-nav-overview">
-          Übersicht
+          Inicio
         </li>
       </ul>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-查询表信息"><span class="nav-number">1.</span> <span class="nav-text">mysql 查询表信息</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -286,7 +290,7 @@
           <a href="/archives/">
         
           <span class="site-state-item-count">2</span>
-          <span class="site-state-item-name">Artikel</span>
+          <span class="site-state-item-name">entradas</span>
         </a>
       </div>
   </nav>
@@ -317,10 +321,10 @@
   </span>
   <span class="author" itemprop="copyrightHolder">fatty</span>
 </div>
-  <div class="powered-by">Erstellt mit  <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.0.0
+  <div class="powered-by">Creado mediante <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.0.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">Design – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.4.2
+  <div class="theme-info">Tema – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.4.2
   </div>
 
         
