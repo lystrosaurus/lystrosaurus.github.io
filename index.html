@@ -344,10 +344,16 @@ Class08 <--> C2: Cool label</pre>
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Veröffentlicht am</span>
-              
 
-              <time title="Erstellt: 2019-10-28 11:01:45 / Geändert am: 14:20:16" itemprop="dateCreated datePublished" datetime="2019-10-28T11:01:45+08:00">2019-10-28</time>
+              <time title="Erstellt: 2019-10-28 11:01:45" itemprop="dateCreated datePublished" datetime="2019-10-28T11:01:45+08:00">2019-10-28</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Bearbeitet am</span>
+                <time title="Geändert am: 2019-11-21 09:41:31" itemprop="dateModified" datetime="2019-11-21T09:41:31+08:00">2019-11-21</time>
+              </span>
 
           
 
@@ -361,6 +367,8 @@ Class08 <--> C2: Cool label</pre>
 
       
           <h2 id="mysql-查询表信息"><a href="#mysql-查询表信息" class="headerlink" title="mysql 查询表信息"></a>mysql 查询表信息</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> information_schema.tables <span class="keyword">where</span> table_name = <span class="string">'?'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> table_schema;</span><br><span class="line"></span><br><span class="line">desc table_name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">show</span> <span class="keyword">full</span> <span class="keyword">fields</span> <span class="keyword">from</span> table_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="mysql-查询超时时间"><a href="#mysql-查询超时时间" class="headerlink" title="mysql 查询超时时间"></a>mysql 查询超时时间</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> <span class="keyword">variables</span> <span class="keyword">like</span>  <span class="string">'%timeout%'</span>;</span><br></pre></td></tr></table></figure>
 
       
     </div>
