@@ -1,0 +1,22 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-border">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-text-muted text-sm">
+        &copy; {year} Fatty. Built with
+        <a href="https://astro.build" class="text-cyan hover:underline" target="_blank" rel="noopener">Astro</a>
+        &
+        <a href="https://tailwindcss.com" class="text-cyan hover:underline" target="_blank" rel="noopener">Tailwind CSS</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/lystrosaurus" class="text-text-muted hover:text-cyan transition-colors" target="_blank" rel="noopener">
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>

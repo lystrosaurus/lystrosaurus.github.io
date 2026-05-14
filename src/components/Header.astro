@@ -1,0 +1,82 @@
+---
+const navItems = [
+  { href: '/', label: '首页', icon: '🏠' },
+  { href: '/blog', label: '博客', icon: '📝' },
+  { href: '/wiki', label: '知识库', icon: '📚' },
+  { href: '/tools', label: '工具', icon: '🛠' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border">
+  <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2 group">
+      <span class="text-2xl font-bold neon-text font-mono">F</span>
+      <span class="text-text-primary group-hover:text-cyan transition-colors">Fatty</span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <ul class="hidden md:flex items-center gap-1">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              'px-4 py-2 rounded-lg transition-all duration-300',
+              currentPath === item.href || currentPath.startsWith(item.href + '/')
+                ? 'bg-cyan/10 text-cyan'
+                : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary',
+            ]}
+          >
+            <span class="mr-1">{item.icon}</span>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden p-2 text-text-secondary hover:text-text-primary"
+      aria-label="Toggle menu"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-bg-secondary border-b border-border">
+    <ul class="px-4 py-2">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[
+              'block px-4 py-3 rounded-lg transition-all duration-300',
+              currentPath === item.href || currentPath.startsWith(item.href + '/')
+                ? 'bg-cyan/10 text-cyan'
+                : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary',
+            ]}
+          >
+            <span class="mr-2">{item.icon}</span>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+
+  btn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+</script>
