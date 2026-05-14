@@ -349,7 +349,7 @@ interface Props {
   description?: string;
 }
 
-const { title, description = 'Fatty\'s personal website - Blog, Wiki, and Developer Tools' } = Astro.props;
+const { title, description = 'Lystrosaurus\'s personal website - Blog, Wiki, and Developer Tools' } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -359,7 +359,7 @@ const { title, description = 'Fatty\'s personal website - Blog, Wiki, and Develo
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title} | Fatty</title>
+    <title>{title} | Lystrosaurus</title>
   </head>
   <body class="min-h-screen bg-bg">
     <Header />
@@ -394,7 +394,7 @@ const currentPath = Astro.url.pathname;
     <!-- Logo -->
     <a href="/" class="flex items-center gap-2 group">
       <span class="text-2xl font-bold neon-text font-mono">F</span>
-      <span class="text-text-primary group-hover:text-cyan transition-colors">Fatty</span>
+      <span class="text-text-primary group-hover:text-cyan transition-colors">Lystrosaurus</span>
     </a>
 
     <!-- Desktop Nav -->
@@ -473,7 +473,7 @@ const year = new Date().getFullYear();
   <div class="max-w-6xl mx-auto px-4 py-8">
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="text-text-muted text-sm">
-        &copy; {year} Fatty. Built with
+        &copy; {year} Lystrosaurus. Built with
         <a href="https://astro.build" class="text-cyan hover:underline" target="_blank" rel="noopener">Astro</a>
         &
         <a href="https://tailwindcss.com" class="text-cyan hover:underline" target="_blank" rel="noopener">Tailwind CSS</a>
@@ -633,7 +633,7 @@ const typeWriterTexts = [
 
       <!-- Name -->
       <h1 class="text-5xl md:text-7xl font-bold mb-4">
-        <span class="text-gradient-cyan-purple">Fatty</span>
+        <span class="text-gradient-cyan-purple">Lystrosaurus</span>
       </h1>
 
       <!-- Typewriter Effect -->

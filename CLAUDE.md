@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Fatty's personal website - a modern dark tech aesthetic site built with Astro, deployed to GitHub Pages at https://lystrosaurus.github.io.
+Lystrosaurus's personal website - a modern dark tech aesthetic site built with Astro, deployed to GitHub Pages at https://lystrosaurus.github.io.
 
 ## Tech Stack
 
