@@ -1,4 +1,8 @@
 ---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description?: string;
@@ -24,7 +28,3 @@ const { title, description = 'Fatty\'s personal website - Blog, Wiki, and Develo
     <Footer />
   </body>
 </html>
-
-<style is:global>
-  @import '../styles/global.css';
-</style>
