@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    @apply bg-bg text-text-primary scroll-smooth;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply min-h-screen antialiased;
+  }
+
+  ::selection {
+    @apply bg-cyan/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full hover:bg-border-hover;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-bg-secondary/80 backdrop-blur-md border border-border rounded-xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-cyan/50 hover:shadow-glow-cyan hover:-translate-y-1;
+  }
+
+  .neon-text {
+    @apply text-cyan;
+    text-shadow: 0 0 10px rgba(0, 255, 242, 0.5), 0 0 20px rgba(0, 255, 242, 0.3);
+  }
+
+  .neon-text-purple {
+    @apply text-purple;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+
+  .glow-border {
+    @apply border border-cyan/30;
+    box-shadow: 0 0 15px rgba(0, 255, 242, 0.1), inset 0 0 15px rgba(0, 255, 242, 0.05);
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-cyan/10 text-cyan border border-cyan/30 rounded-lg
+           hover:bg-cyan/20 hover:shadow-glow-cyan transition-all duration-300;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-purple/10 text-purple border border-purple/30 rounded-lg
+           hover:bg-purple/20 hover:shadow-glow-purple transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-bg-tertiary border border-border rounded-lg
+           text-text-primary placeholder-text-muted
+           focus:outline-none focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30
+           transition-all duration-300;
+  }
+}
+
+@layer utilities {
+  .text-gradient-cyan-purple {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan to-purple;
+  }
+}

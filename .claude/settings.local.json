@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(brainstorming)",
+      "WebFetch(domain:docs.github.com)",
+      "Skill(writing-plans)",
+      "Skill(subagent-driven-development)",
+      "Bash(Remove-Item -Recurse -Force 2019, archives, css, images, js, lib, index.html, CLAUDE.md)",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git reset *)"
+    ]
+  }
+}
