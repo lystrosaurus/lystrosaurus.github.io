@@ -1,8 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-bg-secondary: #111111;
+  --color-bg-tertiary: #1a1a1a;
+
+  --color-cyan: #00fff2;
+  --color-cyan-dim: #00ccc2;
+
+  --color-purple: #a855f7;
+  --color-purple-dim: #8b3fd4;
+
+  --color-text-primary: #e5e5e5;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #666666;
+
+  --color-border: #262626;
+  --color-border-hover: #404040;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --shadow-glow-cyan: 0 0 20px rgba(0, 255, 242, 0.3);
+  --shadow-glow-purple: 0 0 20px rgba(168, 85, 247, 0.3);
+  --shadow-glow-cyan-lg: 0 0 40px rgba(0, 255, 242, 0.2);
+
+  --blur-xs: 2px;
+
+  --animate-typewriter: typewriter 3s steps(30) infinite;
+  --animate-blink: blink 0.7s step-end infinite;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes typewriter {
+    0% { width: 0; }
+    50% { width: 100%; }
+    100% { width: 100%; }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 242, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 242, 0.5); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
 
 @layer base {
   html {
@@ -37,7 +89,7 @@
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:border-cyan/50 hover:shadow-glow-cyan hover:-translate-y-1;
+    @apply bg-bg-secondary/80 backdrop-blur-md border border-border rounded-xl transition-all duration-300 hover:border-cyan/50 hover:shadow-glow-cyan hover:-translate-y-1;
   }
 
   .neon-text {
