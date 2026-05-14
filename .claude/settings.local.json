@@ -20,7 +20,20 @@
       "Bash(git branch *)",
       "Bash(git remote *)",
       "Bash(git check-ignore *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebFetch(domain:lystrosaurus.github.io)",
+      "Bash(gh run *)",
+      "Bash(curl *)",
+      "Bash(npm ci *)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('version:', d.get\\('version'\\)\\); print\\('peer:', d.get\\('peerDependencies'\\)\\)\")",
+      "Bash(python -c \"import json,sys; print\\('tailwindcss:', json.load\\(sys.stdin\\)['version']\\)\")",
+      "Bash(python -c \"import json,sys; print\\('@tailwindcss/vite:', json.load\\(sys.stdin\\)['version']\\)\")",
+      "Bash(python -c \"import json,sys; print\\('@tailwindcss/typography:', json.load\\(sys.stdin\\)['version']\\)\")",
+      "Bash(npm ls *)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('vite \\(dep\\):', d['dependencies'].get\\('vite'\\)\\); print\\('vite \\(peer\\):', d.get\\('peerDependencies',{}\\).get\\('vite'\\)\\)\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('deps:', d.get\\('dependencies'\\)\\); print\\('peer:', d.get\\('peerDependencies'\\)\\)\")"
     ]
   }
 }
