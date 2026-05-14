@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('wiki');
+  return entries
+    .filter((entry) => !entry.data.draft)
+    .map((entry) => ({
+      params: { slug: entry.slug },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <article class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <header class="mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono px-3 py-1 rounded-full bg-purple/10 text-purple border border-purple/20">
+          {entry.data.category}
+        </span>
+        {entry.data.tags.map((tag) => (
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-bg-secondary text-text-muted">#{tag}</span>
+        ))}
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-text-primary mb-4">{entry.data.title}</h1>
+      <p class="text-lg text-text-secondary">{entry.data.description}</p>
+    </header>
+
+    <!-- Divider -->
+    <hr class="border-border mb-10" />
+
+    <!-- Content -->
+    <div class="prose prose-invert prose-cyan max-w-none
+      prose-headings:text-text-primary prose-headings:font-semibold
+      prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
+      prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+      prose-p:text-text-secondary prose-p:leading-relaxed
+      prose-a:text-cyan prose-a:no-underline hover:prose-a:underline
+      prose-strong:text-text-primary
+      prose-code:text-cyan prose-code:font-mono prose-code:text-sm prose-code:bg-bg-tertiary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+      prose-pre:bg-bg-tertiary prose-pre:border prose-pre:border-border prose-pre:rounded-xl
+      prose-blockquote:border-purple/30 prose-blockquote:text-text-secondary
+      prose-th:text-text-primary prose-td:text-text-secondary
+      prose-hr:border-border
+      prose-img:rounded-xl prose-img:border prose-img:border-border">
+      <Content />
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 pt-8 border-t border-border">
+      <a href="/wiki" class="text-purple hover:underline font-mono text-sm">
+        ← 返回知识库
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

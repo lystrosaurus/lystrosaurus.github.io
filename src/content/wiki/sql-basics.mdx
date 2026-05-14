@@ -1,0 +1,115 @@
+---
+title: 'SQL 基础速查'
+description: 'SQL 查询、聚合、连接与子查询常用语法'
+category: '后端'
+order: 2
+tags: ['SQL', '数据库']
+---
+
+## 基本查询
+
+```sql
+SELECT column1, column2
+FROM table_name
+WHERE condition
+ORDER BY column1 DESC
+LIMIT 10 OFFSET 5;
+```
+
+## 条件过滤
+
+```sql
+-- 比较
+WHERE age > 18 AND status = 'active'
+
+-- 范围
+WHERE price BETWEEN 10 AND 100
+
+-- 列表
+WHERE category IN ('tech', 'science')
+
+-- 模糊匹配
+WHERE name LIKE 'J%'          -- 以 J 开头
+WHERE email LIKE '%@gmail.com' -- 以 @gmail.com 结尾
+
+-- NULL
+WHERE deleted_at IS NULL
+WHERE deleted_at IS NOT NULL
+```
+
+## 聚合函数
+
+```sql
+SELECT
+  category,
+  COUNT(*) AS count,
+  AVG(price) AS avg_price,
+  MAX(price) AS max_price,
+  SUM(quantity) AS total
+FROM products
+GROUP BY category
+HAVING COUNT(*) > 5
+ORDER BY count DESC;
+```
+
+## 连接
+
+```sql
+-- 内连接
+SELECT o.id, u.name
+FROM orders o
+INNER JOIN users u ON o.user_id = u.id;
+
+-- 左连接
+SELECT u.name, o.id
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id;
+
+-- 全外连接
+SELECT a.name, b.value
+FROM table_a a
+FULL OUTER JOIN table_b b ON a.id = b.a_id;
+```
+
+## 子查询
+
+```sql
+-- WHERE 中的子查询
+SELECT name FROM users
+WHERE id IN (SELECT user_id FROM orders WHERE total > 100);
+
+-- EXISTS
+SELECT name FROM users u
+WHERE EXISTS (
+  SELECT 1 FROM orders o WHERE o.user_id = u.id
+);
+
+-- FROM 中的子查询
+SELECT category, avg_price
+FROM (
+  SELECT category, AVG(price) AS avg_price
+  FROM products
+  GROUP BY category
+) AS stats
+WHERE avg_price > 50;
+```
+
+## 常用函数
+
+```sql
+-- 字符串
+CONCAT(first_name, ' ', last_name)
+LENGTH(text)
+LOWER(email)
+TRIM(text)
+
+-- 日期
+NOW()
+CURRENT_DATE
+DATE_FORMAT(created_at, '%Y-%m')
+EXTRACT(YEAR FROM created_at)
+
+-- 条件
+COALESCE(nickname, username, 'Anonymous')
+CASE WHEN score >= 90 THEN 'A' WHEN score >= 80 THEN 'B' ELSE 'C' END
+```

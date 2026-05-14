@@ -1,0 +1,93 @@
+---
+title: 'React Hooks 速查'
+description: '常用 Hooks 的用法、陷阱与最佳实践'
+category: '前端'
+order: 2
+tags: ['React', 'Hooks']
+---
+
+## useState
+
+```jsx
+const [count, setCount] = useState(0);
+
+// 函数式更新（依赖前值时必须用）
+setCount((prev) => prev + 1);
+
+// 惰性初始化
+const [state, setState] = useState(() => expensiveCompute());
+```
+
+## useEffect
+
+```jsx
+useEffect(() => {
+  // 副作用
+  fetchData();
+
+  return () => {
+    // 清理
+    cancelRequest();
+  };
+}, [dep1, dep2]); // 依赖数组
+```
+
+**常见陷阱：**
+- 空数组 `[]` = 只在 mount/unmount 时运行
+- 没有依赖数组 = 每次渲染都运行
+- 对象/数组作为依赖会导致无限循环（引用不同）
+
+## useCallback / useMemo
+
+```jsx
+// useCallback：缓存函数引用
+const handleClick = useCallback(() => {
+  doSomething(id);
+}, [id]);
+
+// useMemo：缓存计算结果
+const expensive = useMemo(() => {
+  return items.filter((item) => item.active);
+}, [items]);
+```
+
+**何时使用：**
+- 作为子组件 prop 传递时
+- 计算代价高的派生数据
+- 不要过度使用，大多数情况不需要
+
+## useRef
+
+```jsx
+const ref = useRef(null);
+
+// 访问 DOM
+<input ref={ref} />
+
+// 保存可变值（不触发重渲染）
+const intervalRef = useRef(null);
+intervalRef.current = setInterval(() => {}, 1000);
+```
+
+## 自定义 Hook
+
+```jsx
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+```
+
+## 规则
+
+1. 只在组件或自定义 Hook 顶层调用
+2. 不要在循环、条件或嵌套函数中调用
+3. 自定义 Hook 必须以 `use` 开头

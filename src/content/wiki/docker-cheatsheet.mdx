@@ -1,0 +1,106 @@
+---
+title: 'Docker 常用命令速查'
+description: 'Docker 容器管理、镜像操作与 Compose 常用命令'
+category: '后端'
+order: 1
+tags: ['Docker', 'DevOps']
+---
+
+## 容器管理
+
+```bash
+# 运行容器
+docker run -d -p 8080:80 --name myapp nginx
+
+# 查看运行中的容器
+docker ps
+
+# 查看所有容器（包括停止的）
+docker ps -a
+
+# 停止/启动/重启
+docker stop myapp
+docker start myapp
+docker restart myapp
+
+# 进入容器
+docker exec -it myapp /bin/bash
+
+# 查看日志
+docker logs -f myapp
+
+# 删除容器
+docker rm myapp
+```
+
+## 镜像操作
+
+```bash
+# 拉取镜像
+docker pull nginx:latest
+
+# 查看本地镜像
+docker images
+
+# 构建镜像
+docker build -t myapp:1.0 .
+
+# 删除镜像
+docker rmi myapp:1.0
+
+# 清理未使用的镜像
+docker image prune -a
+```
+
+## Docker Compose
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/mydb
+
+  db:
+    image: postgres:16
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=pass
+
+volumes:
+  pgdata:
+```
+
+```bash
+# 启动所有服务
+docker compose up -d
+
+# 查看状态
+docker compose ps
+
+# 停止并删除
+docker compose down
+
+# 重新构建
+docker compose up -d --build
+```
+
+## 网络与卷
+
+```bash
+# 创建网络
+docker network create mynet
+
+# 创建卷
+docker volume create mydata
+
+# 查看卷
+docker volume ls
+```

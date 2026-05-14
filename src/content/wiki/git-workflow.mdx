@@ -1,0 +1,120 @@
+---
+title: 'Git 工作流速查'
+description: 'Git 分支策略、常用命令与协作技巧'
+category: '工具'
+order: 1
+tags: ['Git', '版本控制']
+---
+
+## 分支策略
+
+### Git Flow
+
+```
+main        ← 生产环境代码
+  └── develop    ← 开发主线
+       ├── feature/xxx  ← 功能分支
+       ├── release/xxx  ← 发布分支
+       └── hotfix/xxx   ← 紧急修复
+```
+
+### Trunk-Based
+
+```
+main        ← 主干，始终可部署
+  └── feature/xxx  ← 短命功能分支（1-2天）
+```
+
+## 常用命令
+
+### 分支操作
+
+```bash
+# 创建并切换分支
+git checkout -b feature/login
+# 或（Git 2.23+）
+git switch -c feature/login
+
+# 查看分支
+git branch -a
+
+# 删除分支
+git branch -d feature/login
+git push origin --delete feature/login
+```
+
+### 提交与推送
+
+```bash
+# 暂存部分修改
+git add -p
+
+# 修改上次提交
+git commit --amend
+
+# 变基
+git rebase main
+
+# 推送并设置上游
+git push -u origin feature/login
+```
+
+### 撤销操作
+
+```bash
+# 撤销工作区修改
+git checkout -- file.txt
+# 或
+git restore file.txt
+
+# 撤销暂存
+git reset HEAD file.txt
+# 或
+git restore --staged file.txt
+
+# 回退提交（保留修改）
+git reset --soft HEAD~1
+
+# 回退提交（丢弃修改）
+git reset --hard HEAD~1
+```
+
+### 查看历史
+
+```bash
+# 简洁日志
+git log --oneline --graph --all
+
+# 查看某文件历史
+git log --follow -p -- file.txt
+
+# 查看两个分支差异
+git diff main..feature/login
+```
+
+## 协作技巧
+
+### 处理冲突
+
+```bash
+git fetch origin
+git rebase origin/main
+# 解决冲突后
+git add .
+git rebase --continue
+```
+
+### 暂存工作
+
+```bash
+git stash
+git stash list
+git stash pop
+git stash drop
+```
+
+### Cherry-pick
+
+```bash
+git cherry-pick <commit-hash>
+```
