@@ -1,0 +1,150 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout title="时间戳转换" description="Unix 时间戳与日期时间互转">
+  <div class="space-y-6">
+    <!-- Current Time -->
+    <div class="glass-card p-4 text-center">
+      <div class="text-sm text-text-muted mb-1">当前时间戳</div>
+      <div id="current-ts" class="text-3xl font-mono neon-text font-bold"></div>
+      <div id="current-date" class="text-sm text-text-secondary mt-1 font-mono"></div>
+    </div>
+
+    <!-- Timestamp → Date -->
+    <div class="glass-card p-5">
+      <h3 class="text-lg font-semibold text-text-primary mb-4">时间戳 → 日期</h3>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-sm text-text-muted mb-1">Unix 时间戳</label>
+          <input id="ts-input" type="text" class="input-field font-mono" placeholder="1715000000" />
+        </div>
+        <div class="flex items-end">
+          <button id="btn-ts-to-date" class="btn-primary">转换</button>
+        </div>
+      </div>
+      <div id="ts-result" class="mt-4 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-bg-tertiary rounded-lg p-3">
+            <div class="text-xs text-text-muted mb-1">本地时间</div>
+            <div id="ts-local" class="font-mono text-sm text-text-primary"></div>
+          </div>
+          <div class="bg-bg-tertiary rounded-lg p-3">
+            <div class="text-xs text-text-muted mb-1">UTC 时间</div>
+            <div id="ts-utc" class="font-mono text-sm text-text-primary"></div>
+          </div>
+          <div class="bg-bg-tertiary rounded-lg p-3">
+            <div class="text-xs text-text-muted mb-1">ISO 8601</div>
+            <div id="ts-iso" class="font-mono text-sm text-text-primary"></div>
+          </div>
+          <div class="bg-bg-tertiary rounded-lg p-3">
+            <div class="text-xs text-text-muted mb-1">相对时间</div>
+            <div id="ts-relative" class="font-mono text-sm text-text-primary"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date → Timestamp -->
+    <div class="glass-card p-5">
+      <h3 class="text-lg font-semibold text-text-primary mb-4">日期 → 时间戳</h3>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-sm text-text-muted mb-1">日期时间</label>
+          <input id="date-input" type="datetime-local" class="input-field font-mono" />
+        </div>
+        <div class="flex items-end">
+          <button id="btn-date-to-ts" class="btn-primary">转换</button>
+        </div>
+      </div>
+      <div id="date-result" class="mt-4 hidden">
+        <div class="bg-bg-tertiary rounded-lg p-3">
+          <div class="text-xs text-text-muted mb-1">Unix 时间戳（秒）</div>
+          <div id="date-ts-sec" class="font-mono text-lg text-cyan font-bold"></div>
+        </div>
+        <div class="bg-bg-tertiary rounded-lg p-3 mt-2">
+          <div class="text-xs text-text-muted mb-1">Unix 时间戳（毫秒）</div>
+          <div id="date-ts-ms" class="font-mono text-lg text-purple font-bold"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="ts-error" class="hidden text-red-400 text-sm font-mono bg-red-500/10 border border-red-500/20 rounded-lg p-3"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  function relativeTime(ts: number): string {
+    const now = Date.now();
+    const diff = now - ts * 1000;
+    const abs = Math.abs(diff);
+    const suffix = diff > 0 ? '前' : '后';
+
+    if (abs < 60_000) return `${Math.floor(abs / 1000)} 秒${suffix}`;
+    if (abs < 3_600_000) return `${Math.floor(abs / 60_000)} 分钟${suffix}`;
+    if (abs < 86_400_000) return `${Math.floor(abs / 3_600_000)} 小时${suffix}`;
+    if (abs < 2_592_000_000) return `${Math.floor(abs / 86_400_000)} 天${suffix}`;
+    return `${Math.floor(abs / 2_592_000_000)} 个月${suffix}`;
+  }
+
+  // Update current timestamp
+  const currentTsEl = document.getElementById('current-ts')!;
+  const currentDateEl = document.getElementById('current-date')!;
+  function updateCurrent() {
+    const now = Math.floor(Date.now() / 1000);
+    currentTsEl.textContent = String(now);
+    currentDateEl.textContent = new Date().toLocaleString('zh-CN');
+  }
+  updateCurrent();
+  setInterval(updateCurrent, 1000);
+
+  // Timestamp → Date
+  document.getElementById('btn-ts-to-date')!.addEventListener('click', () => {
+    const tsError = document.getElementById('ts-error')!;
+    const tsResult = document.getElementById('ts-result')!;
+    tsError.classList.add('hidden');
+
+    const val = (document.getElementById('ts-input') as HTMLInputElement).value.trim();
+    if (!val) return;
+
+    let ms = Number(val);
+    if (isNaN(ms)) {
+      tsError.textContent = '请输入有效的时间戳数字';
+      tsError.classList.remove('hidden');
+      tsResult.classList.add('hidden');
+      return;
+    }
+    // Auto-detect seconds vs milliseconds
+    if (ms < 10_000_000_000) ms *= 1000;
+
+    const date = new Date(ms);
+    document.getElementById('ts-local')!.textContent = date.toLocaleString('zh-CN');
+    document.getElementById('ts-utc')!.textContent = date.toUTCString();
+    document.getElementById('ts-iso')!.textContent = date.toISOString();
+    document.getElementById('ts-relative')!.textContent = relativeTime(Math.floor(ms / 1000));
+    tsResult.classList.remove('hidden');
+  });
+
+  // Date → Timestamp
+  document.getElementById('btn-date-to-ts')!.addEventListener('click', () => {
+    const tsError = document.getElementById('ts-error')!;
+    const dateResult = document.getElementById('date-result')!;
+    tsError.classList.add('hidden');
+
+    const val = (document.getElementById('date-input') as HTMLInputElement).value;
+    if (!val) return;
+
+    const date = new Date(val);
+    if (isNaN(date.getTime())) {
+      tsError.textContent = '请输入有效的日期时间';
+      tsError.classList.remove('hidden');
+      dateResult.classList.add('hidden');
+      return;
+    }
+
+    document.getElementById('date-ts-sec')!.textContent = String(Math.floor(date.getTime() / 1000));
+    document.getElementById('date-ts-ms')!.textContent = String(date.getTime());
+    dateResult.classList.remove('hidden');
+  });
+</script>

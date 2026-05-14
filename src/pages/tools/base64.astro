@@ -1,0 +1,91 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout title="Base64 编解码" description="Base64 编码与解码转换">
+  <div class="space-y-6">
+    <!-- Input -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">输入文本</label>
+      <textarea
+        id="b64-input"
+        class="input-field h-36 font-mono text-sm resize-y"
+        placeholder="输入要编码或解码的内容..."
+      ></textarea>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex flex-wrap gap-3">
+      <button id="btn-encode" class="btn-primary">编码 →</button>
+      <button id="btn-decode" class="btn-secondary">← 解码</button>
+      <button id="btn-copy" class="btn-primary">复制结果</button>
+      <button id="btn-swap" class="btn-secondary">交换</button>
+      <button id="btn-clear" class="btn-secondary">清空</button>
+    </div>
+
+    <!-- Output -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">输出</label>
+      <textarea
+        id="b64-output"
+        class="input-field h-36 font-mono text-sm resize-y"
+        readonly
+      ></textarea>
+    </div>
+
+    <!-- Error -->
+    <div id="b64-error" class="hidden text-red-400 text-sm font-mono bg-red-500/10 border border-red-500/20 rounded-lg p-3"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('b64-input') as HTMLTextAreaElement;
+  const output = document.getElementById('b64-output') as HTMLTextAreaElement;
+  const error = document.getElementById('b64-error')!;
+
+  function showError(msg: string) {
+    error.textContent = msg;
+    error.classList.remove('hidden');
+  }
+
+  function hideError() {
+    error.classList.add('hidden');
+  }
+
+  document.getElementById('btn-encode')!.addEventListener('click', () => {
+    hideError();
+    try {
+      output.value = btoa(unescape(encodeURIComponent(input.value)));
+    } catch (e) {
+      showError(`编码错误: ${(e as Error).message}`);
+    }
+  });
+
+  document.getElementById('btn-decode')!.addEventListener('click', () => {
+    hideError();
+    try {
+      output.value = decodeURIComponent(escape(atob(input.value)));
+    } catch (e) {
+      showError(`解码错误: 输入不是有效的 Base64 字符串`);
+    }
+  });
+
+  document.getElementById('btn-copy')!.addEventListener('click', () => {
+    if (output.value) {
+      navigator.clipboard.writeText(output.value);
+    }
+  });
+
+  document.getElementById('btn-swap')!.addEventListener('click', () => {
+    const temp = input.value;
+    input.value = output.value;
+    output.value = temp;
+    hideError();
+  });
+
+  document.getElementById('btn-clear')!.addEventListener('click', () => {
+    input.value = '';
+    output.value = '';
+    hideError();
+  });
+</script>

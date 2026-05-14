@@ -1,0 +1,136 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const defaultContent = `# Hello World
+
+这是一段 **Markdown** 测试文本。
+
+## 功能列表
+
+- 实时预览
+- 语法高亮
+- 支持常见语法
+
+## 代码示例
+
+\`\`\`javascript
+function hello(name) {
+  return \`Hello, \${name}!\`;
+}
+\`\`\`
+
+> 引用文本示例
+
+[链接](https://example.com)`;
+---
+
+<ToolLayout title="Markdown 预览" description="实时预览 Markdown 渲染效果">
+  <div class="space-y-4">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap gap-2">
+      <button data-action="bold" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">**B**</button>
+      <button data-action="italic" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">*I*</button>
+      <button data-action="code" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">&lt;/&gt;</button>
+      <button data-action="link" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">🔗</button>
+      <button data-action="heading" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">H2</button>
+      <button data-action="list" class="px-3 py-1.5 bg-bg-tertiary border border-border rounded text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors font-mono">•</button>
+    </div>
+
+    <!-- Editor / Preview -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Editor -->
+      <div>
+        <label class="block text-sm font-medium text-text-secondary mb-2">编辑</label>
+        <textarea
+          id="md-input"
+          class="input-field h-[600px] font-mono text-sm resize-y"
+          placeholder="输入 Markdown..."
+          set:html={defaultContent}
+        ></textarea>
+      </div>
+
+      <!-- Preview -->
+      <div>
+        <label class="block text-sm font-medium text-text-secondary mb-2">预览</label>
+        <div
+          id="md-preview"
+          class="prose prose-invert prose-cyan max-w-none h-[600px] overflow-auto bg-bg-tertiary border border-border rounded-xl p-6
+            prose-headings:text-text-primary
+            prose-p:text-text-secondary
+            prose-a:text-cyan
+            prose-strong:text-text-primary
+            prose-code:text-cyan prose-code:font-mono prose-code:text-sm
+            prose-pre:bg-bg prose-pre:border-border prose-pre:rounded-lg
+            prose-blockquote:border-cyan/30 prose-blockquote:text-text-secondary
+            prose-li:text-text-secondary
+            prose-hr:border-border"
+        ></div>
+      </div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  import { marked } from 'marked';
+
+  const input = document.getElementById('md-input') as HTMLTextAreaElement;
+  const preview = document.getElementById('md-preview')!;
+
+  function render() {
+    preview.innerHTML = marked.parse(input.value) as string;
+  }
+
+  input.addEventListener('input', render);
+
+  // Toolbar actions
+  document.querySelectorAll('[data-action]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = (btn as HTMLElement).dataset.action;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const selected = input.value.slice(start, end);
+
+      let insert = '';
+      let cursorOffset = 0;
+
+      switch (action) {
+        case 'bold':
+          insert = `**${selected || '粗体文本'}**`;
+          cursorOffset = selected ? insert.length : 2;
+          break;
+        case 'italic':
+          insert = `*${selected || '斜体文本'}*`;
+          cursorOffset = selected ? insert.length : 1;
+          break;
+        case 'code':
+          if (selected.includes('\n')) {
+            insert = `\`\`\`\n${selected}\n\`\`\``;
+          } else {
+            insert = `\`${selected || '代码'}\``;
+          }
+          cursorOffset = selected ? insert.length : 1;
+          break;
+        case 'link':
+          insert = `[${selected || '链接文本'}](url)`;
+          cursorOffset = selected ? insert.length - 4 : 1;
+          break;
+        case 'heading':
+          insert = `## ${selected || '标题'}`;
+          cursorOffset = selected ? insert.length : 3;
+          break;
+        case 'list':
+          insert = `- ${selected || '列表项'}`;
+          cursorOffset = selected ? insert.length : 2;
+          break;
+      }
+
+      input.value = input.value.slice(0, start) + insert + input.value.slice(end);
+      input.selectionStart = input.selectionEnd = start + cursorOffset;
+      input.focus();
+      render();
+    });
+  });
+
+  // Initial render
+  render();
+</script>

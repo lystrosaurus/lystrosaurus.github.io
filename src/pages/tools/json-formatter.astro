@@ -1,0 +1,84 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout title="JSON 格式化" description="格式化、压缩和验证 JSON 数据">
+  <div class="space-y-6">
+    <!-- Input -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">输入 JSON</label>
+      <textarea
+        id="json-input"
+        class="input-field h-48 font-mono text-sm resize-y"
+        placeholder='{"name":"Fatty","skills":["TypeScript","Go"]}'
+      ></textarea>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex flex-wrap gap-3">
+      <button id="btn-format" class="btn-primary">格式化</button>
+      <button id="btn-minify" class="btn-secondary">压缩</button>
+      <button id="btn-copy" class="btn-primary">复制结果</button>
+      <button id="btn-clear" class="btn-secondary">清空</button>
+    </div>
+
+    <!-- Output -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">输出</label>
+      <pre id="json-output" class="bg-bg-tertiary border border-border rounded-xl p-4 min-h-[12rem] font-mono text-sm text-text-secondary overflow-auto whitespace-pre-wrap"></pre>
+    </div>
+
+    <!-- Error -->
+    <div id="json-error" class="hidden text-red-400 text-sm font-mono bg-red-500/10 border border-red-500/20 rounded-lg p-3"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  const input = document.getElementById('json-input') as HTMLTextAreaElement;
+  const output = document.getElementById('json-output')!;
+  const error = document.getElementById('json-error')!;
+
+  function showError(msg: string) {
+    error.textContent = msg;
+    error.classList.remove('hidden');
+  }
+
+  function hideError() {
+    error.classList.add('hidden');
+  }
+
+  document.getElementById('btn-format')!.addEventListener('click', () => {
+    hideError();
+    try {
+      const obj = JSON.parse(input.value);
+      output.textContent = JSON.stringify(obj, null, 2);
+    } catch (e) {
+      showError(`JSON 解析错误: ${(e as Error).message}`);
+      output.textContent = '';
+    }
+  });
+
+  document.getElementById('btn-minify')!.addEventListener('click', () => {
+    hideError();
+    try {
+      const obj = JSON.parse(input.value);
+      output.textContent = JSON.stringify(obj);
+    } catch (e) {
+      showError(`JSON 解析错误: ${(e as Error).message}`);
+      output.textContent = '';
+    }
+  });
+
+  document.getElementById('btn-copy')!.addEventListener('click', () => {
+    const text = output.textContent;
+    if (text) {
+      navigator.clipboard.writeText(text);
+    }
+  });
+
+  document.getElementById('btn-clear')!.addEventListener('click', () => {
+    input.value = '';
+    output.textContent = '';
+    hideError();
+  });
+</script>

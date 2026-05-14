@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+
+const tools = [
+  {
+    title: 'JSON 格式化',
+    description: '格式化、压缩和验证 JSON 数据',
+    icon: '{ }',
+    href: '/tools/json-formatter',
+    category: '开发',
+  },
+  {
+    title: 'Base64 编解码',
+    description: 'Base64 编码与解码转换',
+    icon: '🔐',
+    href: '/tools/base64',
+    category: '编码',
+  },
+  {
+    title: '时间戳转换',
+    description: 'Unix 时间戳与日期时间互转',
+    icon: '⏱',
+    href: '/tools/timestamp',
+    category: '开发',
+  },
+  {
+    title: '正则表达式测试',
+    description: '实时测试正则表达式匹配',
+    icon: '🔍',
+    href: '/tools/regex-tester',
+    category: '开发',
+  },
+  {
+    title: 'Markdown 预览',
+    description: '实时预览 Markdown 渲染效果',
+    icon: '📝',
+    href: '/tools/markdown-preview',
+    category: '写作',
+  },
+  {
+    title: '番茄钟',
+    description: '专注计时器，提升工作效率',
+    icon: '🍅',
+    href: '/tools/pomodoro',
+    category: '效率',
+  },
+  {
+    title: '待办清单',
+    description: '简单的任务管理工具',
+    icon: '✅',
+    href: '/tools/todo',
+    category: '效率',
+  },
+];
+
+const categories = [...new Set(tools.map((t) => t.category))];
+---
+
+<BaseLayout title="工具" description="开发工具集与实用小工具">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        <span class="text-pink-500">#</span> 工具
+      </h1>
+      <p class="text-text-muted text-lg">开发工具集与实用小工具</p>
+    </div>
+
+    <!-- Tools by Category -->
+    <div class="space-y-10">
+      {categories.map((category) => (
+        <section>
+          <h2 class="text-xl font-bold text-text-primary mb-4 font-mono">{category}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tools
+              .filter((t) => t.category === category)
+              .map((tool) => (
+                <ToolCard {...tool} />
+              ))
+            }
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

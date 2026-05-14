@@ -1,0 +1,146 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout title="正则表达式测试" description="实时测试正则表达式匹配">
+  <div class="space-y-6">
+    <!-- Pattern Input -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">正则表达式</label>
+      <div class="flex gap-2">
+        <div class="flex-1 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-mono">/</span>
+          <input
+            id="regex-pattern"
+            type="text"
+            class="input-field font-mono pl-7 pr-12"
+            placeholder="[a-z]+@[a-z]+\.[a-z]+"
+          />
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted font-mono">/</span>
+        </div>
+        <input
+          id="regex-flags"
+          type="text"
+          class="input-field w-20 font-mono text-center"
+          placeholder="gi"
+          value="gi"
+        />
+      </div>
+    </div>
+
+    <!-- Test String -->
+    <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2">测试文本</label>
+      <textarea
+        id="regex-text"
+        class="input-field h-36 font-mono text-sm resize-y"
+        placeholder="输入要测试的文本..."
+      >hello@example.com, test@domain.org, not-an-email</textarea>
+    </div>
+
+    <!-- Error -->
+    <div id="regex-error" class="hidden text-red-400 text-sm font-mono bg-red-500/10 border border-red-500/20 rounded-lg p-3"></div>
+
+    <!-- Results -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-sm font-medium text-text-secondary">匹配结果</label>
+        <span id="match-count" class="text-xs font-mono text-text-muted"></span>
+      </div>
+      <div id="regex-result" class="bg-bg-tertiary border border-border rounded-xl p-4 min-h-[6rem] font-mono text-sm whitespace-pre-wrap"></div>
+    </div>
+
+    <!-- Match Details -->
+    <div id="match-details" class="hidden">
+      <label class="block text-sm font-medium text-text-secondary mb-2">匹配详情</label>
+      <div id="match-list" class="space-y-2"></div>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  const pattern = document.getElementById('regex-pattern') as HTMLInputElement;
+  const flags = document.getElementById('regex-flags') as HTMLInputElement;
+  const text = document.getElementById('regex-text') as HTMLTextAreaElement;
+  const result = document.getElementById('regex-result')!;
+  const error = document.getElementById('regex-error')!;
+  const count = document.getElementById('match-count')!;
+  const details = document.getElementById('match-details')!;
+  const matchList = document.getElementById('match-list')!;
+
+  function runRegex() {
+    error.classList.add('hidden');
+    result.innerHTML = '';
+    matchList.innerHTML = '';
+    details.classList.add('hidden');
+    count.textContent = '';
+
+    const pat = pattern.value;
+    const txt = text.value;
+    if (!pat || !txt) return;
+
+    let regex: RegExp;
+    try {
+      regex = new RegExp(pat, flags.value);
+    } catch (e) {
+      error.textContent = `正则表达式错误: ${(e as Error).message}`;
+      error.classList.remove('hidden');
+      return;
+    }
+
+    // Find all matches
+    const matches: { match: string; index: number; groups?: string[] }[] = [];
+
+    if (regex.global) {
+      let m;
+      while ((m = regex.exec(txt)) !== null) {
+        matches.push({ match: m[0], index: m.index, groups: m.slice(1) });
+        if (m.index === regex.lastIndex) regex.lastIndex++;
+      }
+    } else {
+      const m = regex.exec(txt);
+      if (m) matches.push({ match: m[0], index: m.index, groups: m.slice(1) });
+    }
+
+    count.textContent = `${matches.length} 个匹配`;
+
+    if (matches.length === 0) {
+      result.innerHTML = '<span class="text-text-muted">无匹配</span>';
+      return;
+    }
+
+    // Highlight matches in text
+    let highlighted = '';
+    let lastIdx = 0;
+    for (const m of matches) {
+      highlighted += escapeHtml(txt.slice(lastIdx, m.index));
+      highlighted += `<mark class="bg-cyan/30 text-cyan rounded px-0.5">${escapeHtml(m.match)}</mark>`;
+      lastIdx = m.index + m.match.length;
+    }
+    highlighted += escapeHtml(txt.slice(lastIdx));
+    result.innerHTML = highlighted;
+
+    // Show details
+    const detailHtml = matches.map((m, i) => {
+      const groups = m.groups && m.groups.length > 0
+        ? m.groups.map((g, gi) => `<div class="text-text-muted ml-4">捕获组 ${gi + 1}: <span class="text-purple">${escapeHtml(g)}</span></div>`).join('')
+        : '';
+      return `
+        <div class="bg-bg-tertiary rounded-lg p-3 border border-border">
+          <div class="text-text-primary"><span class="text-cyan">匹配 ${i + 1}:</span> <span class="text-green-400">"${escapeHtml(m.match)}"</span> <span class="text-text-muted">@ 位置 ${m.index}</span></div>
+          ${groups}
+        </div>
+      `;
+    }).join('');
+    matchList.innerHTML = detailHtml;
+    details.classList.remove('hidden');
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  pattern.addEventListener('input', runRegex);
+  flags.addEventListener('input', runRegex);
+  text.addEventListener('input', runRegex);
+</script>

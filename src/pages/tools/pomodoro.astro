@@ -1,0 +1,147 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+
+<ToolLayout title="番茄钟" description="专注计时器，提升工作效率">
+  <div class="flex flex-col items-center space-y-8 py-8">
+    <!-- Timer Display -->
+    <div class="relative">
+      <div class="absolute inset-0 bg-gradient-to-br from-cyan/20 to-purple/20 rounded-full blur-3xl"></div>
+      <div class="relative w-64 h-64 rounded-full border-4 border-border bg-bg-secondary/80 backdrop-blur-md flex flex-col items-center justify-center shadow-glow-cyan">
+        <div id="timer-display" class="text-6xl font-mono font-bold neon-text">25:00</div>
+        <div id="timer-label" class="text-sm text-text-muted mt-2">专注时间</div>
+      </div>
+    </div>
+
+    <!-- Progress Ring -->
+    <div class="flex gap-8 text-center">
+      <div>
+        <div id="sessions-count" class="text-2xl font-bold text-cyan font-mono">0</div>
+        <div class="text-xs text-text-muted mt-1">完成番茄</div>
+      </div>
+      <div>
+        <div id="total-time" class="text-2xl font-bold text-purple font-mono">0</div>
+        <div class="text-xs text-text-muted mt-1">专注分钟</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex gap-4">
+      <button id="btn-start" class="btn-primary px-8">开始</button>
+      <button id="btn-pause" class="btn-secondary px-8 hidden">暂停</button>
+      <button id="btn-reset" class="btn-secondary">重置</button>
+    </div>
+
+    <!-- Duration Options -->
+    <div class="flex gap-3">
+      <button data-minutes="25" class="pomodoro-option px-4 py-2 rounded-lg border border-cyan/30 text-cyan text-sm font-mono transition-all duration-300 hover:bg-cyan/10">25 分钟</button>
+      <button data-minutes="15" class="pomodoro-option px-4 py-2 rounded-lg border border-border text-text-muted text-sm font-mono transition-all duration-300 hover:border-purple/30 hover:text-purple">15 分钟</button>
+      <button data-minutes="5" class="pomodoro-option px-4 py-2 rounded-lg border border-border text-text-muted text-sm font-mono transition-all duration-300 hover:border-pink-500/30 hover:text-pink-400">5 分钟</button>
+    </div>
+  </div>
+</ToolLayout>
+
+<script>
+  let duration = 25 * 60; // seconds
+  let remaining = duration;
+  let interval: number | null = null;
+  let sessions = 0;
+  let totalMinutes = 0;
+
+  const display = document.getElementById('timer-display')!;
+  const label = document.getElementById('timer-label')!;
+  const startBtn = document.getElementById('btn-start')!;
+  const pauseBtn = document.getElementById('btn-pause')!;
+  const resetBtn = document.getElementById('btn-reset')!;
+  const sessionsEl = document.getElementById('sessions-count')!;
+  const totalEl = document.getElementById('total-time')!;
+
+  function formatTime(s: number): string {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function updateDisplay() {
+    display.textContent = formatTime(remaining);
+  }
+
+  function tick() {
+    if (remaining <= 0) {
+      clearInterval(interval!);
+      interval = null;
+      sessions++;
+      totalMinutes += duration / 60;
+      sessionsEl.textContent = String(sessions);
+      totalEl.textContent = String(totalMinutes);
+      startBtn.classList.remove('hidden');
+      pauseBtn.classList.add('hidden');
+      label.textContent = '完成！';
+      // Play notification sound
+      try {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 800;
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      } catch {}
+      return;
+    }
+    remaining--;
+    updateDisplay();
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (interval) return;
+    startBtn.classList.add('hidden');
+    pauseBtn.classList.remove('hidden');
+    label.textContent = '专注中...';
+    interval = window.setInterval(tick, 1000);
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+      pauseBtn.classList.add('hidden');
+      startBtn.classList.remove('hidden');
+      label.textContent = '已暂停';
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (interval) {
+      clearInterval(interval);
+      interval = null;
+    }
+    remaining = duration;
+    updateDisplay();
+    startBtn.classList.remove('hidden');
+    pauseBtn.classList.add('hidden');
+    label.textContent = '专注时间';
+  });
+
+  // Duration options
+  document.querySelectorAll('.pomodoro-option').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mins = Number((btn as HTMLElement).dataset.minutes);
+      duration = mins * 60;
+      remaining = duration;
+      updateDisplay();
+
+      // Update active state
+      document.querySelectorAll('.pomodoro-option').forEach((b) => {
+        b.classList.remove('border-cyan/30', 'text-cyan');
+        b.classList.add('border-border', 'text-text-muted');
+      });
+      btn.classList.remove('border-border', 'text-text-muted');
+      btn.classList.add('border-cyan/30', 'text-cyan');
+
+      label.textContent = '专注时间';
+    });
+  });
+</script>
