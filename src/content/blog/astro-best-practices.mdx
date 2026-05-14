@@ -1,0 +1,81 @@
+---
+title: 'Astro 静态站点最佳实践'
+description: '从零开始构建一个现代化的静态博客'
+date: '2026-05-10'
+tags: ['Astro', 'SSG', '前端']
+---
+
+## Content Collections
+
+Astro 的 Content Collections 是管理内容的最佳方式：
+
+```typescript
+import { defineCollection, z } from 'astro:content';
+
+const blog = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+  }),
+});
+```
+
+优势：
+- 类型安全的 frontmatter 验证
+- 自动生成类型定义
+- 与 MDX 深度集成
+
+## 组件设计原则
+
+### 最小化客户端 JS
+
+```astro
+<!-- 好：静态渲染 -->
+<Button client:visible />
+
+<!-- 好：服务端渲染 -->
+<Card />
+```
+
+### 使用 Slot 组合
+
+```astro
+<!-- BaseLayout.astro -->
+<html>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+## 样式方案
+
+推荐 Tailwind CSS + @tailwindcss/typography：
+
+- 自定义设计系统（颜色、间距、阴影）
+- Typography 插件处理 Markdown 内容样式
+- 响应式设计内置支持
+
+## 部署
+
+GitHub Pages 配置：
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [master]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+```
+
+享受构建过程！

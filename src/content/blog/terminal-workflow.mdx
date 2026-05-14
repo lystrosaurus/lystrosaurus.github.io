@@ -1,0 +1,78 @@
+---
+title: '终端工作流优化指南'
+description: '我的命令行配置与提效技巧'
+date: '2026-05-05'
+tags: ['Terminal', 'Productivity', 'Shell']
+---
+
+## Shell 配置
+
+我使用 Zsh + Oh My Zsh，关键配置：
+
+```bash
+# ~/.zshrc
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+plugins=(git docker kubectl zsh-autosuggestions zsh-syntax-highlighting)
+```
+
+## 必装工具
+
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| `fzf` | 模糊搜索 | `brew install fzf` |
+| `bat` | 带语法高亮的 cat | `brew install bat` |
+| `eza` | 现代 ls 替代 | `brew install eza` |
+| `fd` | 更快的 find | `brew install fd` |
+| `ripgrep` | 更快的 grep | `brew install ripgrep` |
+| `tldr` | 简化 man pages | `brew install tldr` |
+
+## Git 别名
+
+```bash
+# ~/.gitconfig
+[alias]
+  co = checkout
+  br = branch
+  ci = commit
+  st = status
+  lg = log --oneline --graph --all --decorate
+  last = log -1 HEAD --stat
+```
+
+## 快捷操作
+
+### 目录跳转
+
+```bash
+alias ..="cd .."
+alias ...="cd ../.."
+alias proj="cd ~/projects"
+```
+
+### 快速编辑
+
+```bash
+alias zshrc="$EDITOR ~/.zshrc"
+alias reload="source ~/.zshrc"
+```
+
+## 多路复用器
+
+Tmux 是终端多任务的利器：
+
+```bash
+# 新建会话
+tmux new -s work
+
+# 分屏
+Ctrl+b %  # 水平分割
+Ctrl+b "  # 垂直分割
+
+# 切换面板
+Ctrl+b 方向键
+```
+
+## 结语
+
+工具的价值在于习惯的养成。选几个用熟，比全部浅尝辄止更有效。

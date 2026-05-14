@@ -1,0 +1,57 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+}
+
+const { title, description, date, tags } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <header class="mb-10">
+      <time class="text-sm text-text-muted font-mono block mb-3">{date}</time>
+      <h1 class="text-4xl md:text-5xl font-bold text-text-primary mb-4">{title}</h1>
+      <p class="text-lg text-text-secondary mb-6">{description}</p>
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan/10 text-cyan border border-cyan/20">
+            #{tag}
+          </span>
+        ))}
+      </div>
+    </header>
+
+    <!-- Divider -->
+    <hr class="border-border mb-10" />
+
+    <!-- Content -->
+    <div class="prose prose-invert prose-cyan max-w-none
+      prose-headings:text-text-primary prose-headings:font-semibold
+      prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
+      prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+      prose-p:text-text-secondary prose-p:leading-relaxed
+      prose-a:text-cyan prose-a:no-underline hover:prose-a:underline
+      prose-strong:text-text-primary
+      prose-code:text-cyan prose-code:font-mono prose-code:text-sm prose-code:bg-bg-tertiary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+      prose-pre:bg-bg-tertiary prose-pre:border prose-pre:border-border prose-pre:rounded-xl
+      prose-blockquote:border-cyan/30 prose-blockquote:text-text-secondary
+      prose-th:text-text-primary prose-td:text-text-secondary
+      prose-hr:border-border
+      prose-img:rounded-xl prose-img:border prose-img:border-border">
+      <slot />
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 pt-8 border-t border-border">
+      <a href="/blog" class="text-cyan hover:underline font-mono text-sm">
+        ← 返回博客列表
+      </a>
+    </footer>
+  </article>
+</BaseLayout>
