@@ -135,8 +135,8 @@ Entity 类型任务占 50%+（514 个实体类），但这些不需要深度分�
 ### 第一阶段：快速全覆盖（2-3 小时）
 
 ```bash
-python evolve.py --project lann-wxapp-service \
-  --project-path "C:\project\lann_WxApp_Service" \
+python evolve.py --project wxapp-service \
+  --project-path "C:\project\WxApp_Service" \
   --count 50 --mode local
 ```
 
@@ -145,8 +145,8 @@ python evolve.py --project lann-wxapp-service \
 ### 第二阶段：核心深化（按优先级）
 
 ```bash
-python evolve.py --project lann-wxapp-service \
-  --project-path "C:\project\lann_WxApp_Service" \
+python evolve.py --project wxapp-service \
+  --project-path "C:\project\WxApp_Service" \
   --count 10 --mode batch
 ```
 
@@ -155,9 +155,9 @@ python evolve.py --project lann-wxapp-service \
 ### 第三阶段：知识整合
 
 ```bash
-python -m engine.main synthesize --project-name lann-wxapp-service
-python evolve.py --project lann-wxapp-service --contradiction-check
-python evolve.py --project lann-wxapp-service --feedback
+python -m engine.main synthesize --project-name wxapp-service
+python evolve.py --project wxapp-service --contradiction-check
+python evolve.py --project wxapp-service --feedback
 ```
 
 ## 踩坑记录
