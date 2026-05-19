@@ -33,7 +33,10 @@
       "Bash(python -c \"import json,sys; print\\('@tailwindcss/typography:', json.load\\(sys.stdin\\)['version']\\)\")",
       "Bash(npm ls *)",
       "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('vite \\(dep\\):', d['dependencies'].get\\('vite'\\)\\); print\\('vite \\(peer\\):', d.get\\('peerDependencies',{}\\).get\\('vite'\\)\\)\")",
-      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('deps:', d.get\\('dependencies'\\)\\); print\\('peer:', d.get\\('peerDependencies'\\)\\)\")"
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('deps:', d.get\\('dependencies'\\)\\); print\\('peer:', d.get\\('peerDependencies'\\)\\)\")",
+      "Bash(Select-String -Pattern \"error|Error|ERR|failed|Failed\" -Context 2,0)",
+      "Bash(Select-Object -First 20)",
+      "Bash(git rm *)"
     ]
   }
 }
