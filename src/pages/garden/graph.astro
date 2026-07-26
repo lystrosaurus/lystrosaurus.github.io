@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { books, categories } from '../../data/books';
 import { getCategoryColor } from '../../utils/garden';
 import '../../styles/garden.css';
@@ -91,6 +92,7 @@ for (const e of edges) {
   <div class="garden-root">
     <div class="garden-container">
       <h1 class="garden-page-title">关联图谱</h1>
+      <Breadcrumbs items={[{ label: '首页', href: '/' }, { label: '书库', href: '/books' }, { label: '关联图谱' }]} />
       <p class="garden-page-subtitle">
         节点即书，边即关联 · 点击节点跳转到书目详情 · 共 {nodes.length} 本 / {edges.length} 条关联
       </p>

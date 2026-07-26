@@ -1,0 +1,200 @@
+---
+/**
+ * BottomNav — 全站底部固定导航，专为手机优先体验设计。
+ * 桌面端（md+）隐藏，由顶部 Header 承担；移动端常驻底部，拇指可及。
+ * 主格：首页 / 书库 / 图谱 / 复盘；「更多」展开其余入口（博客/知识库/工具/笔记/搜索/Agent）。
+ * 当前路由高亮由 currentPath 推导；「更多」弹出层由内联 <script> 切换。
+ */
+const currentPath = Astro.url.pathname;
+
+const mainItems = [
+  { href: '/', label: '首页', icon: '🏠' },
+  { href: '/books', label: '书库', icon: '📚' },
+  { href: '/garden/graph', label: '图谱', icon: '🕸' },
+  { href: '/syntheses', label: '复盘', icon: '🔗' },
+];
+
+const moreItems = [
+  { href: '/blog', label: '博客', icon: '📝' },
+  { href: '/wiki', label: '知识库', icon: '📚' },
+  { href: '/tools', label: '工具', icon: '🛠' },
+  { href: '/notes', label: '笔记', icon: '📒' },
+  { href: '/garden/agent', label: 'Agent', icon: '🤖' },
+  { href: '/search', label: '搜索', icon: '🔍' },
+];
+
+const isActive = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath === href || currentPath.startsWith(href + '/');
+---
+
+<nav class="bottom-nav" aria-label="底部导航">
+  <ul class="bottom-nav-list">
+    {
+      mainItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={['bottom-nav-item', isActive(item.href) && 'bottom-nav-item-active']}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            <span class="bottom-nav-icon">{item.icon}</span>
+            <span class="bottom-nav-label">{item.label}</span>
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <button type="button" class="bottom-nav-item" id="bottom-more-btn" aria-expanded="false" aria-controls="bottom-more-panel">
+        <span class="bottom-nav-icon">⋯</span>
+        <span class="bottom-nav-label">更多</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- 更多弹出层 -->
+  <div class="bottom-more-panel" id="bottom-more-panel" hidden>
+    {
+      moreItems.map((item) => (
+        <a href={item.href} class="bottom-more-link">
+          <span>{item.icon}</span>
+          {item.label}
+        </a>
+      ))
+    }
+  </div>
+</nav>
+
+<script>
+  const btn = document.getElementById('bottom-more-btn');
+  const panel = document.getElementById('bottom-more-panel');
+  if (btn && panel) {
+    const toggle = () => {
+      const open = panel.hasAttribute('hidden');
+      if (open) {
+        panel.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        panel.setAttribute('hidden', '');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+    // 点击外部关闭
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target as Node) && e.target !== btn) {
+        panel.setAttribute('hidden', '');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    // 跳转后自动收起
+    panel.querySelectorAll('a').forEach((a) =>
+      a.addEventListener('click', () => {
+        panel.setAttribute('hidden', '');
+        btn.setAttribute('aria-expanded', 'false');
+      }),
+    );
+  }
+</script>
+
+<style>
+  .bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: block;
+    background: rgba(17, 17, 17, 0.92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--color-border);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .bottom-nav-list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.5rem 0.25rem 0.6rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: 0.62rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .bottom-nav-item:active {
+    color: var(--color-cyan);
+  }
+  .bottom-nav-item-active {
+    color: var(--color-cyan);
+  }
+  .bottom-nav-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .bottom-nav-label {
+    font-size: 0.68rem;
+  }
+  .bottom-nav-item-active .bottom-nav-label {
+    font-weight: 600;
+  }
+
+  .bottom-more-panel {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    right: 0.75rem;
+    width: min(14rem, 80vw);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+  .bottom-more-panel[hidden] {
+    display: none;
+  }
+  .bottom-more-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 0.5rem;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background 0.2s ease;
+  }
+  .bottom-more-link:hover,
+  .bottom-more-link:active {
+    background: var(--color-bg-tertiary);
+    color: var(--color-cyan);
+  }
+
+  /* 桌面端隐藏底部栏，由顶部导航承担 */
+  @media (min-width: 768px) {
+    .bottom-nav {
+      display: none;
+    }
+  }
+
+  /* 为底部栏留出页面底部空间（移动端） */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: 3.5rem;
+    }
+  }
+</style>

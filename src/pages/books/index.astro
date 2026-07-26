@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BookCard from '../../components/BookCard.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { books, categories } from '../../data/books';
 import '../../styles/garden.css';
 
@@ -17,6 +18,7 @@ const categoryMap = new Map(categories.map((c) => [c.id, c]));
   <div class="garden-root">
     <div class="garden-container">
       <h1 class="garden-page-title">智识花园 · 书库</h1>
+      <Breadcrumbs items={[{ label: '首页', href: '/' }, { label: '书库' }]} />
       <p class="garden-page-subtitle">
         已藏书 <span class="garden-accent-text">{total}</span> 本 ·
         <span class="garden-accent-text">{extractedCount}</span> 本已榨取 ·

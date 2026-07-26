@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BookCard from '../../components/BookCard.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { books, categories } from '../../data/books';
 import { getCategoryColor, getLevelColor, getLevelLabel, renderInlineMarkdown } from '../../utils/garden';
 import type { KPLevel } from '../../data/books.types';
@@ -30,6 +31,7 @@ const kpByLevel = (level: KPLevel) =>
 <BaseLayout title={book.title} description={`${book.title} · ${book.author} — 知识花园书库`}>
   <div class="garden-root">
     <div class="garden-container">
+      <Breadcrumbs items={[{ label: '首页', href: '/' }, { label: '书库', href: '/books' }, { label: book.title }]} />
       <!-- Header -->
       <header class="garden-detail-header">
         <h1 class="garden-detail-title">{book.title}</h1>

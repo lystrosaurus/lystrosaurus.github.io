@@ -1,0 +1,59 @@
+---
+/**
+ * Breadcrumbs — 轻量面包屑，移动端友好（可换行、点击区域大）。
+ * 用法：<Breadcrumbs items={[{label:'首页',href:'/'},{label:'书库',href:'/books'},{label:'书名'}]} />
+ * 最后一项无 href 表示当前页（不渲染为链接）。
+ */
+interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  items: Crumb[];
+}
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="面包屑">
+  {
+    items.map((item, i) => (
+      <span class="breadcrumb-item">
+        {item.href ? (
+          <a href={item.href} class="breadcrumb-link">{item.label}</a>
+        ) : (
+          <span class="breadcrumb-current" aria-current="page">{item.label}</span>
+        )}
+        {i < items.length - 1 && <span class="breadcrumb-sep">›</span>}
+      </span>
+    ))
+  }
+</nav>
+
+<style>
+  .breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1.25rem;
+  }
+  .breadcrumb-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: 0.15rem 0.1rem;
+    transition: color 0.2s ease;
+  }
+  .breadcrumb-link:hover {
+    color: var(--color-cyan);
+  }
+  .breadcrumb-current {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+  .breadcrumb-sep {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+</style>
