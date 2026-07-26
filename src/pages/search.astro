@@ -83,7 +83,8 @@ const searchIndex: SearchItem[] = [
 
 <!-- Search index injected as a JSON data-island (robust alternative to
      define:vars that works with TypeScript / imported client scripts). -->
-<script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex)}></script>
+<!-- 数据岛对 '<' 转义为 \u003c，避免 </script> 提前闭合（即使当下数据均来自可信种子，仍加固以防未来接入外部数据） -->
+<script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex).replace(/</g, '\\u003c')}></script>
 
 <script>
   import Fuse from 'fuse.js';

@@ -15,6 +15,12 @@
  *   ④ 关联 relate：对称化 relatedBookIds、剔除悬空引用、重算 meta.bookCount、
  *      更新 lastReviewedAt、写入运行日志 —— 仅当有实际变化时执行。
  *
+ * 阶段调度（与 WorkBuddy 定时自动化配合）：
+ *   默认（无参数）：四步全跑（兼容一次性手动运行）。
+ *   --phase daily   ：仅跑 ① 补充 + ② 榨取（每日节奏）。
+ *   --phase weekly  ：仅跑 ③ 复盘 + ④ 关联（每周节奏）。
+ *   各阶段独立幂等，只有实际变化才写盘 / 提交。
+ *
  * 幂等性：序列化采用 scripts/garden-serialize.mjs 的确定性输出（2 空格缩进、数组按 id 排序、
  * 知识点按 基础→进阶→心法 排序、结尾换行）。若序列化结果与原文件字节一致，
  * 判定「无变化」，直接退出 0，不写盘、不提交。
@@ -55,6 +61,17 @@ function nowStamp() {
 }
 
 async function main() {
+  // 阶段解析：--phase daily（①②）/ --phase weekly（③④）/ 默认 all（四步全跑）
+  const phaseArg = process.argv.find((a) => a.startsWith('--phase='));
+  const phase = phaseArg ? phaseArg.split('=')[1] : 'all';
+  if (!['all', 'daily', 'weekly'].includes(phase)) {
+    console.error('[garden:run] 未知阶段 --phase=' + phase + '（应为 daily|weekly|all）');
+    process.exit(2);
+  }
+  const runDaily = phase === 'all' || phase === 'daily';
+  const runWeekly = phase === 'all' || phase === 'weekly';
+  const phaseLabel = phase === 'daily' ? '补充+榨取' : phase === 'weekly' ? '复盘+关联' : '全周期';
+
   // 1) 载入实时模型（strip-types 直接 import 运行期数组）
   const mod = await import(pathToFileURL(BOOKS_TS).href);
   const model = {
@@ -70,8 +87,8 @@ async function main() {
 
   let changed = false;
 
-  // ① supplement：仅追加 PENDING_POOL 中尚不存在的书目（按 id 去重）
-  if (Array.isArray(PENDING_POOL) && PENDING_POOL.length > 0) {
+  // ① 补充 supplement（daily / all）：仅追加 PENDING_POOL 中尚不存在的书目（按 id 去重）
+  if (runDaily && Array.isArray(PENDING_POOL) && PENDING_POOL.length > 0) {
     const existing = new Set(model.books.map((b) => b.id));
     for (const nb of PENDING_POOL) {
       if (!nb || !nb.id || existing.has(nb.id)) continue;
@@ -81,29 +98,31 @@ async function main() {
     }
   }
 
-  // ② extract：当前无内容来源配置，no-op（保留扩展点：当 book.contentSource 存在时在此抽取）
+  // ② 榨取 extract（daily / all）：当前无内容来源配置，no-op（保留扩展点：当 book.contentSource 存在时在此抽取）
 
-  // ③ synthesize：no-op（种子已含 1 条；未发现新跨书主题则不追加）
+  // ③ 复盘 synthesize（weekly / all）：no-op（种子已含 1 条；未发现新跨书主题则不追加）
 
-  // ④ relate：对称化 + 去悬空 + 重算 bookCount
-  const bookIds = new Set(model.books.map((b) => b.id));
-  for (const b of model.books) {
-    const clean = (b.relatedBookIds || []).filter((r) => bookIds.has(r));
-    if (clean.length !== (b.relatedBookIds || []).length) {
-      b.relatedBookIds = clean;
-      changed = true;
-    }
-    for (const r of b.relatedBookIds) {
-      const other = model.books.find((x) => x.id === r);
-      if (other && !other.relatedBookIds.includes(b.id)) {
-        other.relatedBookIds.push(b.id);
+  // ④ 关联 relate（weekly / all）：对称化 + 去悬空 + 重算 bookCount
+  if (runWeekly) {
+    const bookIds = new Set(model.books.map((b) => b.id));
+    for (const b of model.books) {
+      const clean = (b.relatedBookIds || []).filter((r) => bookIds.has(r));
+      if (clean.length !== (b.relatedBookIds || []).length) {
+        b.relatedBookIds = clean;
         changed = true;
       }
+      for (const r of b.relatedBookIds) {
+        const other = model.books.find((x) => x.id === r);
+        if (other && !other.relatedBookIds.includes(b.id)) {
+          other.relatedBookIds.push(b.id);
+          changed = true;
+        }
+      }
     }
-  }
-  if (model.meta.bookCount !== model.books.length) {
-    model.meta.bookCount = model.books.length;
-    changed = true;
+    if (model.meta.bookCount !== model.books.length) {
+      model.meta.bookCount = model.books.length;
+      changed = true;
+    }
   }
 
   // 仅当有变化时更新时间戳 + 运行日志
@@ -112,8 +131,8 @@ async function main() {
     model.meta.lastReviewedAt = stamp;
     model.agentLog.unshift({
       time: stamp,
-      action: '关联',
-      detail: 'Agent 周期：对称化相关书目、清理悬空引用、重算书目计数。',
+      action: phase === 'daily' ? '补充' : phase === 'weekly' ? '关联' : '关联',
+      detail: `Agent ${phaseLabel}：对称化相关书目、清理悬空引用、重算书目计数。`,
     });
     if (model.agentLog.length > 100) model.agentLog.length = 100;
   }
@@ -140,7 +159,7 @@ async function main() {
   const { execSync } = await import('node:child_process');
   try {
     execSync('git add src/data/books.ts', { cwd: repoRoot, stdio: 'inherit' });
-    execSync('git commit -m "[bot] knowledge-garden: 周期更新（关联/复盘）"', {
+    execSync(`git commit -m "[bot] knowledge-garden: ${phaseLabel} 周期更新"`, {
       cwd: repoRoot,
       stdio: 'inherit',
     });
