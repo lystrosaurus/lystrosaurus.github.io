@@ -26,3 +26,12 @@ pnpm-debug.log*
 
 # Lock files (optional, but recommended for libraries)
 # package-lock.json
+
+# Knowledge-garden / debug scratch artifacts (untracked build logs & dumps)
+build_alt.log
+build_out.log
+build_verbose.log
+build_xss.log
+commit_xss.txt
+git_status.txt
+dist_old_bak/
