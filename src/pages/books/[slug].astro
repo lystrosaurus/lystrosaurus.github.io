@@ -76,11 +76,12 @@ const kpByLevel = (level: KPLevel) =>
               const color = getLevelColor(level);
               return (
                 <div style="margin-bottom:1.75rem;">
-                  <h3 style={`color:${color};font-weight:700;margin-bottom:0.75rem;`}>
+                  <h3 class="garden-kp-level-head" style={`color:${color}`}>
+                    <span class="garden-kp-level-dot" style={`color:${color};background:${color}`}></span>
                     {getLevelLabel(level)}
                   </h3>
                   {list.map((kp) => (
-                    <div class="garden-kp">
+                    <div class="garden-kp" data-level={kp.level}>
                       <span class="garden-kp-level" style={`background:${color}`}>
                         {getLevelLabel(kp.level)}
                       </span>

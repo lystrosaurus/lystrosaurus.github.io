@@ -10,19 +10,34 @@
   /* 棕金色板（局部 CSS 变量，仅作用于本子树） */
   --garden-bg: #0f0e0c;
   --garden-card: #221f1b;
+  --garden-card-hover: #2a2620;
   --garden-text: #e8e0d4;
   --garden-accent: #c9954a;
   --garden-border: #3a3530;
+  --garden-border-hover: #5a4f3f;
   --garden-secondary: #a39888;
   --garden-level-base: #8a9a5b;
   --garden-level-mid: #c9954a;
   --garden-level-mind: #cf7d52;
+  /* 三级知识点的柔和底色，用于卡片左侧色条与徽标 */
+  --garden-level-base-bg: rgba(138, 154, 91, 0.14);
+  --garden-level-mid-bg: rgba(201, 149, 74, 0.14);
+  --garden-level-mind-bg: rgba(207, 125, 82, 0.16);
 
   background: var(--garden-bg);
   color: var(--garden-text);
   font-family: Georgia, 'Noto Serif SC', 'Songti SC', serif;
   min-height: calc(100vh - 4rem);
   line-height: 1.7;
+}
+
+/* 页面标题轻微浮动，呼应全站青紫主题的呼吸感（不影响可读性） */
+.garden-page-title {
+  animation: garden-float 7s ease-in-out infinite;
+}
+@keyframes garden-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .garden-root * {
@@ -73,12 +88,19 @@
   border-radius: 0.75rem;
   padding: 1.1rem 1.25rem;
   text-align: center;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+.garden-stat:hover {
+  border-color: var(--garden-border-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(201, 149, 74, 0.12);
 }
 .garden-stat-num {
   font-size: 1.9rem;
   font-weight: 700;
   color: var(--garden-accent);
   line-height: 1.1;
+  text-shadow: 0 0 16px rgba(201, 149, 74, 0.35);
 }
 .garden-stat-label {
   margin-top: 0.35rem;
@@ -119,12 +141,25 @@
 .garden-chip:hover {
   color: var(--garden-text);
   border-color: var(--garden-accent);
+  box-shadow: 0 0 12px rgba(201, 149, 74, 0.18);
 }
 .garden-chip-active {
   color: var(--garden-bg);
   background: var(--garden-accent);
   border-color: var(--garden-accent);
   font-weight: 600;
+  box-shadow: 0 0 14px rgba(201, 149, 74, 0.35);
+}
+
+/* 筛选结果实时计数 */
+.garden-filter-count {
+  font-size: 0.82rem;
+  color: var(--garden-secondary);
+  margin-left: 0.4rem;
+}
+.garden-filter-count strong {
+  color: var(--garden-accent);
+  font-weight: 700;
 }
 
 /* ---- Grid + cards ---- */
@@ -141,13 +176,28 @@
   border-radius: 0.85rem;
   padding: 1.25rem;
   height: 100%;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.garden-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--garden-accent), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 .garden-card:hover {
   transform: translateY(-4px);
   border-color: var(--garden-accent);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: var(--garden-card-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(201, 149, 74, 0.15);
   text-decoration: none;
+}
+.garden-card:hover::before {
+  opacity: 1;
 }
 .garden-card-title {
   font-size: 1.15rem;
@@ -248,13 +298,49 @@
   font-style: italic;
 }
 
-/* ---- Knowledge points ---- */
+/* ---- Knowledge points (three-tier visual hierarchy) ---- */
+.garden-kp-level-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.85rem;
+  padding: 0.25rem 0 0.25rem 0;
+}
+/* 层级标前的色点，色由内联样式驱动 */
+.garden-kp-level-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  box-shadow: 0 0 8px currentColor;
+}
+/* 每个知识点卡片按 data-level 显示左侧色条 + 轻柔底色 */
 .garden-kp {
+  position: relative;
   border: 1px solid var(--garden-border);
+  border-left-width: 3px;
   border-radius: 0.6rem;
-  padding: 0.9rem 1.1rem;
+  padding: 0.85rem 1.1rem;
   margin-bottom: 0.75rem;
   background: var(--garden-card);
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+}
+.garden-kp:hover {
+  transform: translateX(2px);
+  background: var(--garden-card-hover);
+}
+.garden-kp[data-level='基础'] {
+  border-left-color: var(--garden-level-base);
+  background: linear-gradient(90deg, var(--garden-level-base-bg), transparent 60%), var(--garden-card);
+}
+.garden-kp[data-level='进阶'] {
+  border-left-color: var(--garden-level-mid);
+  background: linear-gradient(90deg, var(--garden-level-mid-bg), transparent 60%), var(--garden-card);
+}
+.garden-kp[data-level='心法'] {
+  border-left-color: var(--garden-level-mind);
+  background: linear-gradient(90deg, var(--garden-level-mind-bg), transparent 60%), var(--garden-card);
 }
 .garden-kp-concept {
   font-weight: 600;
@@ -266,10 +352,11 @@
   font-size: 0.92rem;
   margin-top: 0.3rem;
 }
+/* 卡片内小色标 */
 .garden-kp-level {
   display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   padding: 0.12rem 0.55rem;
   border-radius: 9999px;
   margin-bottom: 0.4rem;
@@ -298,15 +385,27 @@
 
 /* ---- Synthesis card ---- */
 .garden-synthesis-card {
+  position: relative;
   background: var(--garden-card);
   border: 1px solid var(--garden-border);
   border-radius: 0.85rem;
   padding: 1.5rem;
   margin-bottom: 1.25rem;
-  transition: border-color 0.25s ease;
+  overflow: hidden;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+/* 主题色左侧竖条（颜色由内联 style 驱动） */
+.garden-synthesis-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--garden-accent);
 }
 .garden-synthesis-card:hover {
-  border-color: var(--garden-accent);
+  border-color: var(--garden-border-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(201, 149, 74, 0.12);
 }
 .garden-synthesis-title {
   font-size: 1.3rem;
@@ -317,6 +416,17 @@
   color: var(--garden-accent);
   font-size: 0.85rem;
   margin: 0.25rem 0 0.75rem;
+}
+/* 复盘包含的书籍数徽标 */
+.garden-synthesis-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(201, 149, 74, 0.16);
+  color: var(--garden-accent);
+  margin-left: 0.6rem;
+  vertical-align: 0.15rem;
 }
 .garden-synthesis-summary {
   color: var(--garden-secondary);
@@ -335,6 +445,7 @@
 }
 .garden-book-tag:hover {
   border-color: var(--garden-accent);
+  background: rgba(201, 149, 74, 0.1);
   text-decoration: none;
 }
 
@@ -350,26 +461,54 @@
   height: auto;
 }
 .garden-graph-node circle {
-  transition: opacity 0.2s ease, stroke 0.2s ease;
+  transition: opacity 0.2s ease, stroke 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
   cursor: pointer;
 }
+.garden-graph-node:hover circle {
+  filter: drop-shadow(0 0 6px currentColor);
+}
+/* 节点标签按分类着色（color 由内联 style 驱动），默认柔色 */
 .garden-graph-node text {
   fill: var(--garden-text);
   font-size: 11px;
   font-family: Georgia, 'Noto Serif SC', serif;
   pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 .garden-graph-edge {
-  stroke-width: 1;
+  stroke-width: 1.2;
   transition: opacity 0.2s ease;
 }
 .garden-graph-node.dim,
 .garden-graph-edge.dim {
-  opacity: 0.12;
+  opacity: 0.1;
 }
 .garden-graph-node.hl circle {
-  stroke: var(--garden-accent);
+  stroke: #f0e6d2;
   stroke-width: 2.5;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.garden-graph-node.hl text {
+  fill: #fff;
+}
+/* 图例 */
+.garden-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--garden-secondary);
+}
+.garden-graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.garden-graph-legend-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
 }
 
 /* ---- Agent log ---- */

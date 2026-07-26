@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { books, categories } from '../../data/books';
+import { getCategoryColor } from '../../utils/garden';
 import '../../styles/garden.css';
 
 /**
@@ -16,6 +17,7 @@ interface GraphNode {
   accent: string;
   title: string;
   category: string;
+  catColor: string;
 }
 interface GraphEdge {
   from: string;
@@ -45,9 +47,10 @@ function computeRadial(
         id: b.id,
         x,
         y,
-        accent: b.accent,
+        accent: getCategoryColor(cat.id),
         title: b.title,
         category: cat.id,
+        catColor: getCategoryColor(cat.id),
       });
     });
   });
@@ -91,6 +94,18 @@ for (const e of edges) {
       <p class="garden-page-subtitle">
         节点即书，边即关联 · 点击节点跳转到书目详情 · 共 {nodes.length} 本 / {edges.length} 条关联
       </p>
+
+      <!-- Legend -->
+      <div class="garden-graph-legend">
+        {
+          categories.map((c) => (
+            <span class="garden-graph-legend-item">
+              <span class="garden-graph-legend-dot" style={`background:${getCategoryColor(c.id)}`}></span>
+              {c.icon} {c.name}
+            </span>
+          ))
+        }
+      </div>
 
       <!-- Category filter -->
       <div class="garden-filters">
@@ -155,17 +170,18 @@ for (const e of edges) {
                     data-id={n.id}
                     data-category={n.category}
                     data-related={rel}
+                    style={`color:${n.catColor}`}
                   >
                     <a href={`/books/${n.id}`}>
                       <circle
                         cx={n.x}
                         cy={n.y}
                         r="9"
-                        fill={n.accent}
+                        fill={n.catColor}
                         stroke="#3a3530"
                         stroke-width="1"
                       />
-                      <text x={labelX} y={labelY} text-anchor="middle">{n.title}</text>
+                      <text x={labelX} y={labelY} text-anchor="middle" style={`fill:${n.catColor}`}>{n.title}</text>
                     </a>
                   </g>
                 );

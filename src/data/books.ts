@@ -158,7 +158,7 @@ export const books: Book[] = [
     "author": "James Clear",
     "category": "habits",
     "year": 2018,
-    "accent": "#E17055",
+    "accent": "#d9a05b",
     "summary": "不靠意志力，而靠系统的设计与身份的重构，让 1% 的微小改进在复利下累积成巨大改变。",
     "coreThesis": "你得到的不是你想要的，而是你反复做的。",
     "knowledgePoints": [

@@ -27,8 +27,11 @@ const bookMap = new Map(books.map((b) => [b.id, b]));
         </div>
       ) : (
         syntheses.map((s) => (
-          <div class="garden-synthesis-card">
-            <div class="garden-synthesis-title" set:html={escapeHtml(s.title)}></div>
+          <div class="garden-synthesis-card" style="--garden-accent:#c9954a">
+            <div class="garden-synthesis-title">
+              <span set:html={escapeHtml(s.title)}></span>
+              <span class="garden-synthesis-count">{s.bookIds.length} 本书</span>
+            </div>
             <div class="garden-synthesis-theme" set:html={escapeHtml(s.theme)}></div>
             <div class="garden-synthesis-summary" set:html={renderInlineMarkdown(s.summary)}></div>
 

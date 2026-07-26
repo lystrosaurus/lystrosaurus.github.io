@@ -55,6 +55,7 @@ const categoryMap = new Map(categories.map((c) => [c.id, c]));
               </button>
             ))
           }
+          <span class="garden-filter-count" id="result-count"></span>
         </div>
         <div class="garden-filter-group" id="status-filter">
           <span class="garden-filter-label">状态</span>
@@ -103,10 +104,17 @@ const categoryMap = new Map(categories.map((c) => [c.id, c]));
   let activeStatus = '';
 
   function apply(): void {
+    let visible = 0;
     for (const el of items) {
       const okCat = activeCat === '' || el.dataset.category === activeCat;
       const okStatus = activeStatus === '' || el.dataset.extracted === activeStatus;
-      el.style.display = okCat && okStatus ? '' : 'none';
+      const show = okCat && okStatus;
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
+    }
+    const countEl = document.getElementById('result-count');
+    if (countEl) {
+      countEl.innerHTML = `共 <strong>${visible}</strong> 本`;
     }
   }
 
