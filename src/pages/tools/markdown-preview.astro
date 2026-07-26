@@ -72,12 +72,15 @@ function hello(name) {
 
 <script>
   import { marked } from 'marked';
+  import { escapeHtml } from '../../utils/dom';
 
   const input = document.getElementById('md-input') as HTMLTextAreaElement;
   const preview = document.getElementById('md-preview')!;
 
   function render() {
-    preview.innerHTML = marked.parse(input.value) as string;
+    // Escape user-controlled input before Markdown parsing to prevent XSS
+    // (e.g. `<img src=x onerror=...>` injected through the editor).
+    preview.innerHTML = marked.parse(escapeHtml(input.value)) as string;
   }
 
   input.addEventListener('input', render);
