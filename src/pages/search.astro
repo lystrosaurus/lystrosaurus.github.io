@@ -1,16 +1,18 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { books, categories } from '../data/books';
 
 const blogEntries = await getCollection('blog');
 const wikiEntries = await getCollection('wiki');
 
 interface SearchItem {
-  type: 'blog' | 'wiki' | 'tool';
+  type: 'blog' | 'wiki' | 'tool' | 'book';
   title: string;
   description: string;
   tags: string[];
   category?: string;
+  author?: string;
   url: string;
 }
 
@@ -46,6 +48,18 @@ const searchIndex: SearchItem[] = [
   { type: 'tool', title: 'Markdown 预览', description: '实时预览 Markdown 渲染效果', tags: ['Markdown', '写作'], url: '/tools/markdown-preview' },
   { type: 'tool', title: '番茄钟', description: '专注计时器，提升工作效率', tags: ['番茄钟', '效率'], url: '/tools/pomodoro' },
   { type: 'tool', title: '待办清单', description: '简单的任务管理工具', tags: ['待办', '效率'], url: '/tools/todo' },
+  ...books.map((b) => {
+    const cat = categories.find((c) => c.id === b.category);
+    return {
+      type: 'book' as const,
+      title: b.title,
+      description: b.summary,
+      tags: cat ? [cat.name] : [b.category],
+      category: b.author,
+      author: b.author,
+      url: '/books/' + b.id,
+    };
+  }),
 ];
 ---
 
@@ -75,11 +89,12 @@ const searchIndex: SearchItem[] = [
   import Fuse from 'fuse.js';
 
   interface SearchItem {
-    type: 'blog' | 'wiki' | 'tool';
+    type: 'blog' | 'wiki' | 'tool' | 'book';
     title: string;
     description: string;
     tags: string[];
     category?: string;
+    author?: string;
     url: string;
   }
 
@@ -91,7 +106,7 @@ const searchIndex: SearchItem[] = [
   );
 
   const fuse = new Fuse<SearchItem>(searchIndex, {
-    keys: ['title', 'description', 'tags', 'category'],
+    keys: ['title', 'description', 'tags', 'category', 'author'],
     threshold: 0.4,
     includeMatches: true,
   });
@@ -100,9 +115,10 @@ const searchIndex: SearchItem[] = [
     blog: '博客',
     wiki: '知识库',
     tool: '工具',
+    book: '书库',
   };
 
-  const GROUP_ORDER: string[] = ['blog', 'wiki', 'tool'];
+  const GROUP_ORDER: string[] = ['blog', 'wiki', 'tool', 'book'];
 
   function escapeHtml(s: string): string {
     return s

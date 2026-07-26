@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "garden:validate": "node --experimental-strip-types scripts/validate-books.mjs",
+    "garden:run": "node --experimental-strip-types scripts/knowledge-garden-agent.mjs"
   },
   "dependencies": {
     "astro": "^6.3.3",

@@ -1,0 +1,189 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { books, categories } from '../../data/books';
+import '../../styles/garden.css';
+
+/**
+ * Build-time deterministic "radial-by-category" layout (zero dependency).
+ * Each category occupies a sector; its books sit on concentric rings so nodes
+ * never overlap. Coordinates are computed once at build time and emitted as a
+ * static SVG; the client script only does hover-highlight + category filter.
+ */
+interface GraphNode {
+  id: string;
+  x: number;
+  y: number;
+  accent: string;
+  title: string;
+  category: string;
+}
+interface GraphEdge {
+  from: string;
+  to: string;
+  color: string;
+}
+
+function computeRadial(
+  bs: typeof books,
+  cats: typeof categories,
+): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const BASE = 130;
+  const RING_STEP = 78;
+  const N = cats.length;
+  const pos = new Map<string, { x: number; y: number }>();
+  const nodes: GraphNode[] = [];
+
+  cats.forEach((cat, i) => {
+    const theta = (2 * Math.PI * i) / N - Math.PI / 2; // start at top
+    const members = bs.filter((b) => b.category === cat.id);
+    members.forEach((b, k) => {
+      const r = BASE + k * RING_STEP;
+      const x = r * Math.cos(theta);
+      const y = r * Math.sin(theta);
+      pos.set(b.id, { x, y });
+      nodes.push({
+        id: b.id,
+        x,
+        y,
+        accent: b.accent,
+        title: b.title,
+        category: cat.id,
+      });
+    });
+  });
+
+  const seen = new Set<string>();
+  const edges: GraphEdge[] = [];
+  for (const b of bs) {
+    for (const rid of b.relatedBookIds) {
+      if (!pos.has(rid)) continue;
+      const key = [b.id, rid].sort().join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      edges.push({ from: b.id, to: rid, color: b.accent });
+    }
+  }
+  return { nodes, edges };
+}
+
+const { nodes, edges } = computeRadial(books, categories);
+
+// viewBox sized to the maximum node radius (+ label padding).
+const maxR = nodes.reduce((m, n) => Math.max(m, Math.hypot(n.x, n.y)), 0);
+const half = maxR + 70;
+
+// Pre-compute neighbour ids per node for the client script.
+const neighbours = new Map<string, string[]>();
+for (const e of edges) {
+  const a = neighbours.get(e.from) ?? [];
+  a.push(e.to);
+  neighbours.set(e.from, a);
+  const b = neighbours.get(e.to) ?? [];
+  b.push(e.from);
+  neighbours.set(e.to, b);
+}
+---
+
+<BaseLayout title="关联图谱" description="知识花园 · 关联图谱：书与书的脉络">
+  <div class="garden-root">
+    <div class="garden-container">
+      <h1 class="garden-page-title">关联图谱</h1>
+      <p class="garden-page-subtitle">
+        节点即书，边即关联 · 点击节点跳转到书目详情 · 共 {nodes.length} 本 / {edges.length} 条关联
+      </p>
+
+      <!-- Category filter -->
+      <div class="garden-filters">
+        <div class="garden-filter-group" id="graph-cat-filter">
+          <span class="garden-filter-label">高亮分类</span>
+          <button type="button" class="garden-chip garden-chip-active garden-graph-chip" data-cat="">
+            全部
+          </button>
+          {
+            categories.map((c) => (
+              <button type="button" class="garden-chip garden-graph-chip" data-cat={c.id}>
+                {c.icon} {c.name}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="garden-graph-wrap">
+        <svg
+          class="garden-graph-svg"
+          viewBox={`-${half} -${half} ${half * 2} ${half * 2}`}
+          role="img"
+          aria-label="书籍关联图谱"
+        >
+          <!-- edges -->
+          <g>
+            {
+              edges.map((e) => {
+                const a = nodes.find((n) => n.id === e.from)!;
+                const b = nodes.find((n) => n.id === e.to)!;
+                return (
+                  <line
+                    class="garden-graph-edge"
+                    data-from={e.from}
+                    data-to={e.to}
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    stroke={e.color}
+                    stroke-opacity="0.5"
+                  />
+                );
+              })
+            }
+          </g>
+
+          <!-- nodes -->
+          <g>
+            {
+              nodes.map((n) => {
+                const r = Math.hypot(n.x, n.y) || 1;
+                const dirX = n.x / r;
+                const dirY = n.y / r;
+                const labelX = n.x + dirX * 16;
+                const labelY = n.y + dirY * 16 + 4;
+                const rel = (neighbours.get(n.id) ?? []).join(',');
+                return (
+                  <g
+                    class="garden-graph-node"
+                    data-id={n.id}
+                    data-category={n.category}
+                    data-related={rel}
+                  >
+                    <a href={`/books/${n.id}`}>
+                      <circle
+                        cx={n.x}
+                        cy={n.y}
+                        r="9"
+                        fill={n.accent}
+                        stroke="#3a3530"
+                        stroke-width="1"
+                      />
+                      <text x={labelX} y={labelY} text-anchor="middle">{n.title}</text>
+                    </a>
+                  </g>
+                );
+              })
+            }
+          </g>
+        </svg>
+      </div>
+
+      <p style="margin-top:2rem;">
+        <a href="/books">← 返回书库</a>
+        {' · '}
+        <a href="/garden/agent">Agent 看板 →</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/garden-graph.client';
+</script>

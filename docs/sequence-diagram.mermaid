@@ -1,0 +1,66 @@
+sequenceDiagram
+  %% ① 构建期：总览/详情/复盘 页面渲染
+  participant A as Astro Build
+  participant P as books/*.astro
+  participant D as books.ts (data)
+  participant S as garden.css
+  A->>P: import data + styles
+  P->>D: import {books, categories, syntheses, agentLog, meta}
+  D-->>P: typed arrays
+  P->>P: render stats / cards / filters / quotes
+  P->>S: apply .garden-root scope (no global leak)
+  P-->>A: static HTML
+
+  %% ② 构建期：详情页 getStaticPaths
+  participant SL as books/[slug].astro
+  A->>SL: getStaticPaths(books)
+  SL->>D: import books
+  D-->>SL: books[]
+  SL->>SL: for each book -> /books/<id>.html
+  SL-->>A: static detail pages
+
+  %% ③ 构建期：图谱页（径向布局 → 静态 SVG）
+  participant G as garden/graph.astro
+  participant L as GraphLayout
+  G->>D: import books
+  G->>L: computeRadial(books, categories)
+  L-->>G: nodes[] + edges[]
+  G->>G: render static SVG (node = <a href=/books/<id>>)
+  G-->>A: static graph page
+
+  %% ④ 运行期：图谱交互（零网络）
+  participant CL as garden-graph.client.ts
+  participant DOM as SVG DOM
+  CL->>DOM: read data-related / data-category
+  CL-->>DOM: hover 高亮邻居 / 分类过滤 (class toggle)
+
+  %% ⑤ Agent runner 四步幂等周期
+  participant W as WorkBuddy Automation
+  participant R as knowledge-garden-agent.mjs
+  participant M as books.ts (import via strip-types)
+  participant SE as garden-serialize.mjs
+  participant V as validate-books.mjs
+  participant Git as GitHub (push main)
+  W->>R: trigger (daily/weekly)
+  R->>M: import (--experimental-strip-types)
+  M-->>R: in-memory model (source of truth)
+  R->>R: step1 supplement (append, id-dedup)
+  R->>R: step2 extract (fill KP/actionable/quotes)
+  R->>R: step3 synthesize (append syntheses)
+  R->>R: step4 relate (symmetrize + meta/agentLog)
+  R->>SE: serialize(model)
+  SE-->>R: deterministic books.ts text
+  R->>V: assertIntegrity(model)
+  alt content hash changed
+    R->>M: overwrite books.ts
+    R->>Git: commit [bot] + push main
+    Git->>Git: Actions deploy (no agent re-trigger)
+  else unchanged
+    R-->>W: no-op (idempotent, no commit)
+  end
+
+  %% 任务依赖图（T01/T02 基座，T03/T04/T05 并行依赖二者）
+  Note over A,Git: Task dependency graph
+  Note over A,Git: T01(infra) ─┐
+  Note over A,Git: T02(data)  ─┤→ T03(pages) / T04(graph+agent) / T05(integration)
+  Note over A,Git: T01 ────────┘

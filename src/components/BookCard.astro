@@ -1,0 +1,36 @@
+---
+/**
+ * Shared book card used by the overview grid and the detail page's
+ * "related books" section. Dynamic text is injected via normal Astro
+ * interpolation (auto-escaped); the category colour is applied inline as hex
+ * so Tailwind 4's dynamic class limitation is avoided.
+ */
+import type { Book, Category } from '../data/books.types';
+import { getCategoryColor } from '../utils/garden';
+
+interface Props {
+  book: Book;
+  category: Category;
+}
+
+const { book, category } = Astro.props;
+const catColor = getCategoryColor(category.id);
+---
+
+<a href={`/books/${book.id}`} class="garden-card">
+  <h3 class="garden-card-title">{book.title}</h3>
+  <div class="garden-card-meta">{book.author} · {book.year}</div>
+  <p class="garden-card-summary">{book.summary}</p>
+  <div class="garden-card-footer">
+    <span class="garden-cat-tag" style={`color:${catColor}`}>
+      <span>{category.icon}</span>{category.name}
+    </span>
+    {
+      book.extracted ? (
+        <span class="garden-badge garden-badge-done">✓ 已榨取</span>
+      ) : (
+        <span class="garden-badge garden-badge-pending">⏳ 待榨取</span>
+      )
+    }
+  </div>
+</a>

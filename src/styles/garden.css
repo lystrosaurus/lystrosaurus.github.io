@@ -1,0 +1,423 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+/* =========================================================================
+ * 知识花园 / 书库 —— 独立「暗色文明」棕金衬线主题
+ * 全部规则均挂在 .garden-root 作用域下，绝不向全站青紫科技主题泄漏。
+ * 动态色一律内联 hex（style="color:#xxx"），不依赖 Tailwind 动态工具类。
+ * ========================================================================= */
+
+.garden-root {
+  /* 棕金色板（局部 CSS 变量，仅作用于本子树） */
+  --garden-bg: #0f0e0c;
+  --garden-card: #221f1b;
+  --garden-text: #e8e0d4;
+  --garden-accent: #c9954a;
+  --garden-border: #3a3530;
+  --garden-secondary: #a39888;
+  --garden-level-base: #8a9a5b;
+  --garden-level-mid: #c9954a;
+  --garden-level-mind: #cf7d52;
+
+  background: var(--garden-bg);
+  color: var(--garden-text);
+  font-family: Georgia, 'Noto Serif SC', 'Songti SC', serif;
+  min-height: calc(100vh - 4rem);
+  line-height: 1.7;
+}
+
+.garden-root * {
+  box-sizing: border-box;
+}
+
+.garden-container {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.garden-root a {
+  color: var(--garden-accent);
+  text-decoration: none;
+}
+.garden-root a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Page header ---- */
+.garden-page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+  color: var(--garden-text);
+}
+.garden-page-subtitle {
+  color: var(--garden-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+}
+.garden-accent-text {
+  color: var(--garden-accent);
+}
+
+/* ---- Stats ---- */
+.garden-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.garden-stat {
+  background: var(--garden-card);
+  border: 1px solid var(--garden-border);
+  border-radius: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  text-align: center;
+}
+.garden-stat-num {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--garden-accent);
+  line-height: 1.1;
+}
+.garden-stat-label {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--garden-secondary);
+}
+
+/* ---- Filters ---- */
+.garden-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+.garden-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.garden-filter-label {
+  font-size: 0.85rem;
+  color: var(--garden-secondary);
+  margin-right: 0.25rem;
+}
+.garden-chip {
+  cursor: pointer;
+  user-select: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  border: 1px solid var(--garden-border);
+  background: var(--garden-card);
+  color: var(--garden-secondary);
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+.garden-chip:hover {
+  color: var(--garden-text);
+  border-color: var(--garden-accent);
+}
+.garden-chip-active {
+  color: var(--garden-bg);
+  background: var(--garden-accent);
+  border-color: var(--garden-accent);
+  font-weight: 600;
+}
+
+/* ---- Grid + cards ---- */
+.garden-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.25rem;
+}
+.garden-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--garden-card);
+  border: 1px solid var(--garden-border);
+  border-radius: 0.85rem;
+  padding: 1.25rem;
+  height: 100%;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.garden-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--garden-accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+}
+.garden-card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--garden-text);
+  margin-bottom: 0.25rem;
+}
+.garden-card-meta {
+  font-size: 0.85rem;
+  color: var(--garden-secondary);
+  margin-bottom: 0.9rem;
+}
+.garden-card-summary {
+  font-size: 0.9rem;
+  color: var(--garden-secondary);
+  margin-bottom: 1rem;
+  flex: 1;
+}
+.garden-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+/* ---- Category tag ---- */
+.garden-cat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+}
+
+/* ---- Extraction badge ---- */
+.garden-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.garden-badge-done {
+  background: rgba(138, 154, 91, 0.18);
+  color: #a7b873;
+}
+.garden-badge-pending {
+  background: rgba(163, 152, 136, 0.15);
+  color: var(--garden-secondary);
+}
+
+/* ---- Section titles ---- */
+.garden-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--garden-border);
+  color: var(--garden-text);
+}
+.garden-section-title .garden-accent-bar {
+  display: inline-block;
+  width: 0.35rem;
+  height: 1.4rem;
+  background: var(--garden-accent);
+  margin-right: 0.6rem;
+  vertical-align: -0.2rem;
+  border-radius: 2px;
+}
+
+/* ---- Book detail ---- */
+.garden-detail-header {
+  margin-bottom: 2rem;
+}
+.garden-detail-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--garden-text);
+  margin-bottom: 0.5rem;
+}
+.garden-detail-meta {
+  color: var(--garden-secondary);
+  font-size: 0.95rem;
+}
+.garden-detail-meta .garden-accent-text {
+  color: var(--garden-accent);
+}
+.garden-blockquote {
+  border-left: 3px solid var(--garden-accent);
+  padding: 0.75rem 1.25rem;
+  margin: 1rem 0;
+  background: rgba(201, 149, 74, 0.07);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--garden-text);
+  font-style: italic;
+}
+
+/* ---- Knowledge points ---- */
+.garden-kp {
+  border: 1px solid var(--garden-border);
+  border-radius: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 0.75rem;
+  background: var(--garden-card);
+}
+.garden-kp-concept {
+  font-weight: 600;
+  color: var(--garden-text);
+  font-size: 1.02rem;
+}
+.garden-kp-detail {
+  color: var(--garden-secondary);
+  font-size: 0.92rem;
+  margin-top: 0.3rem;
+}
+.garden-kp-level {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.12rem 0.55rem;
+  border-radius: 9999px;
+  margin-bottom: 0.4rem;
+  color: #0f0e0c;
+}
+
+/* ---- Lists ---- */
+.garden-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.garden-list li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.6rem;
+  color: var(--garden-secondary);
+}
+.garden-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0.3rem;
+  top: 0;
+  color: var(--garden-accent);
+}
+
+/* ---- Synthesis card ---- */
+.garden-synthesis-card {
+  background: var(--garden-card);
+  border: 1px solid var(--garden-border);
+  border-radius: 0.85rem;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.25s ease;
+}
+.garden-synthesis-card:hover {
+  border-color: var(--garden-accent);
+}
+.garden-synthesis-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--garden-text);
+}
+.garden-synthesis-theme {
+  color: var(--garden-accent);
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0.75rem;
+}
+.garden-synthesis-summary {
+  color: var(--garden-secondary);
+  margin-bottom: 0.9rem;
+}
+.garden-book-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid var(--garden-border);
+  color: var(--garden-text);
+  margin: 0 0.4rem 0.4rem 0;
+  transition: all 0.2s ease;
+}
+.garden-book-tag:hover {
+  border-color: var(--garden-accent);
+  text-decoration: none;
+}
+
+/* ---- Graph ---- */
+.garden-graph-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.garden-graph-svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+.garden-graph-node circle {
+  transition: opacity 0.2s ease, stroke 0.2s ease;
+  cursor: pointer;
+}
+.garden-graph-node text {
+  fill: var(--garden-text);
+  font-size: 11px;
+  font-family: Georgia, 'Noto Serif SC', serif;
+  pointer-events: none;
+}
+.garden-graph-edge {
+  stroke-width: 1;
+  transition: opacity 0.2s ease;
+}
+.garden-graph-node.dim,
+.garden-graph-edge.dim {
+  opacity: 0.12;
+}
+.garden-graph-node.hl circle {
+  stroke: var(--garden-accent);
+  stroke-width: 2.5;
+}
+
+/* ---- Agent log ---- */
+.garden-log {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+.garden-log-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--garden-border);
+}
+.garden-log-time {
+  color: var(--garden-secondary);
+  white-space: nowrap;
+}
+.garden-log-action {
+  color: var(--garden-accent);
+  font-weight: 600;
+  min-width: 4rem;
+}
+.garden-log-detail {
+  color: var(--garden-text);
+}
+
+/* ---- Empty state ---- */
+.garden-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--garden-secondary);
+}
+.garden-empty .garden-empty-title {
+  font-size: 1.4rem;
+  color: var(--garden-text);
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Inline markdown (set:html output) ---- */
+.garden-md-code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.3rem;
+  font-size: 0.9em;
+  color: var(--garden-accent);
+}
+.garden-md-strong {
+  font-weight: 700;
+  color: var(--garden-text);
+}

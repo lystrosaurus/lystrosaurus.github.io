@@ -1,0 +1,91 @@
+classDiagram
+  class Category {
+    +id: CategoryId
+    +name: string
+    +icon: string
+    +desc: string
+    +accent: string
+  }
+  class KnowledgePoint {
+    +concept: string
+    +detail: string
+    +level: KPLevel
+  }
+  class Book {
+    +id: string
+    +title: string
+    +author: string
+    +category: CategoryId
+    +year: number
+    +accent: string
+    +summary: string
+    +coreThesis: string
+    +knowledgePoints: KnowledgePoint[]
+    +actionable: string[]
+    +quotes: string[]
+    +relatedBookIds: string[]
+    +extracted: boolean
+    +extractedAt: string|null
+    +getSlug() string
+  }
+  class Synthesis {
+    +id: string
+    +title: string
+    +theme: string
+    +bookIds: string[]
+    +summary: string
+    +points: string[]
+  }
+  class LogEntry {
+    +time: string
+    +action: string
+    +detail: string
+  }
+  class GardenMeta {
+    +generatedAt: string
+    +lastReviewedAt: string|null
+    +agentVersion: string
+    +bookCount: number
+    +note: string
+  }
+  class GardenData {
+    +categories: Category[]
+    +books: Book[]
+    +syntheses: Synthesis[]
+    +agentLog: LogEntry[]
+    +meta: GardenMeta
+    +getBookBySlug(id) Book
+    +getBooksByCategory(cat) Book[]
+    +assertIntegrity() void
+  }
+  class BookValidator {
+    +validate(model) string[]
+  }
+  class GardenSerializer {
+    +serialize(model) string
+    +writeFile(path, text) void
+  }
+  class AgentRunner {
+    +loadModel() GardenData
+    +step1_supplement()
+    +step2_extract()
+    +step3_synthesize()
+    +step4_relate()
+    +run() void
+  }
+  class GraphLayout {
+    +computeRadial(books, categories) Node[] Edge[]
+  }
+
+  Book "1" --> "1" Category : category
+  Book "1" --> "*" KnowledgePoint : knowledgePoints
+  Book "1" --> "*" Book : relatedBookIds
+  Synthesis "1" --> "*" Book : bookIds
+  GardenData "1" *-- "*" Book
+  GardenData "1" *-- "*" Category
+  GardenData "1" *-- "*" Synthesis
+  GardenData "1" *-- "*" LogEntry
+  AgentRunner ..> GardenData : mutates (in-memory)
+  AgentRunner ..> GardenSerializer : uses
+  AgentRunner ..> BookValidator : uses
+  GraphLayout ..> Book : reads

@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookCard from '../../components/BookCard.astro';
+import { books, categories } from '../../data/books';
+import { getCategoryColor, getLevelColor, getLevelLabel, renderInlineMarkdown } from '../../utils/garden';
+import type { KPLevel } from '../../data/books.types';
+import '../../styles/garden.css';
+
+export function getStaticPaths() {
+  return books.map((book) => ({
+    params: { slug: book.id },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+const category = categories.find((c) => c.id === book.category);
+const catColor = getCategoryColor(book.category);
+
+const categoryMap = new Map(categories.map((c) => [c.id, c]));
+const relatedBooks = book.relatedBookIds
+  .map((id) => books.find((b) => b.id === id))
+  .filter((b): b is (typeof books)[number] => Boolean(b));
+
+const LEVELS: KPLevel[] = ['基础', '进阶', '心法'];
+const kpByLevel = (level: KPLevel) =>
+  book.knowledgePoints.filter((kp) => kp.level === level);
+---
+
+<BaseLayout title={book.title} description={`${book.title} · ${book.author} — 知识花园书库`}>
+  <div class="garden-root">
+    <div class="garden-container">
+      <!-- Header -->
+      <header class="garden-detail-header">
+        <h1 class="garden-detail-title">{book.title}</h1>
+        <div class="garden-detail-meta">
+          <span class="garden-accent-text">{book.author}</span>
+          {' · '}{book.year}
+          {' · '}
+          <span style={`color:${catColor}`}>{category?.icon} {category?.name}</span>
+          {
+            book.extracted ? (
+              <span class="garden-badge garden-badge-done" style="margin-left:0.5rem;">✓ 已榨取</span>
+            ) : (
+              <span class="garden-badge garden-badge-pending" style="margin-left:0.5rem;">⏳ 待榨取</span>
+            )
+          }
+        </div>
+      </header>
+
+      <!-- Summary -->
+      {book.summary && (
+        <p class="garden-card-summary" style="font-size:1rem;margin-bottom:2rem;">{book.summary}</p>
+      )}
+
+      <!-- Core thesis -->
+      {book.coreThesis && (
+        <section>
+          <h2 class="garden-section-title">
+            <span class="garden-accent-bar"></span>核心命题
+          </h2>
+          <blockquote class="garden-blockquote">{book.coreThesis}</blockquote>
+        </section>
+      )}
+
+      <!-- Knowledge points by level -->
+      <section>
+        <h2 class="garden-section-title">
+          <span class="garden-accent-bar"></span>知识点
+        </h2>
+        {
+          book.extracted && book.knowledgePoints.length > 0 ? (
+            LEVELS.map((level) => {
+              const list = kpByLevel(level);
+              if (list.length === 0) return null;
+              const color = getLevelColor(level);
+              return (
+                <div style="margin-bottom:1.75rem;">
+                  <h3 style={`color:${color};font-weight:700;margin-bottom:0.75rem;`}>
+                    {getLevelLabel(level)}
+                  </h3>
+                  {list.map((kp) => (
+                    <div class="garden-kp">
+                      <span class="garden-kp-level" style={`background:${color}`}>
+                        {getLevelLabel(kp.level)}
+                      </span>
+                      <div class="garden-kp-concept">{kp.concept}</div>
+                      <div class="garden-kp-detail" set:html={renderInlineMarkdown(kp.detail)} />
+                    </div>
+                  ))}
+                </div>
+              );
+            })
+          ) : (
+            <p class="garden-empty">
+              <span class="garden-empty-title">待榨取</span>
+              这本书的内容尚未榨取。Agent 会在周期运行中补充知识点、可行动洞察与金句。
+            </p>
+          )
+        }
+      </section>
+
+      <!-- Actionable insights -->
+      {
+        book.extracted && book.actionable.length > 0 && (
+          <section>
+            <h2 class="garden-section-title">
+              <span class="garden-accent-bar"></span>可行动洞察
+            </h2>
+            <ul class="garden-list">
+              {book.actionable.map((a) => (
+                <li set:html={renderInlineMarkdown(a)} />
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <!-- Quotes -->
+      {
+        book.extracted && book.quotes.length > 0 && (
+          <section>
+            <h2 class="garden-section-title">
+              <span class="garden-accent-bar"></span>金句
+            </h2>
+            {book.quotes.map((q) => (
+              <blockquote class="garden-blockquote">{q}</blockquote>
+            ))}
+          </section>
+        )
+      }
+
+      <!-- Related books -->
+      {
+        relatedBooks.length > 0 && (
+          <section>
+            <h2 class="garden-section-title">
+              <span class="garden-accent-bar"></span>关联书目
+            </h2>
+            <div class="garden-grid">
+              {relatedBooks.map((rb) => {
+                const cat = categoryMap.get(rb.category);
+                return cat ? <BookCard book={rb} category={cat} /> : null;
+              })}
+            </div>
+          </section>
+        )
+      }
+
+      <p style="margin-top:2.5rem;">
+        <a href="/books">← 返回书库</a>
+        {' · '}
+        <a href="/syntheses">查看跨书复盘 →</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>

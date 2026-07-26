@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { books, categories, syntheses, agentLog, meta } from '../../data/books';
+import { formatDate } from '../../utils/garden';
+import '../../styles/garden.css';
+
+const total = books.length;
+const extractedCount = books.filter((b) => b.extracted).length;
+const recentLog = agentLog.slice(0, 20);
+---
+
+<BaseLayout title="Agent 看板" description="知识花园 · Agent 看板：书库演化与健康状态">
+  <div class="garden-root">
+    <div class="garden-container">
+      <h1 class="garden-page-title">Agent 状态</h1>
+      <p class="garden-page-subtitle">
+        agentVersion <span class="garden-accent-text">{meta.agentVersion}</span>
+        {' · '}lastReviewedAt <span class="garden-accent-text">{formatDate(meta.lastReviewedAt)}</span>
+      </p>
+
+      <!-- Counts -->
+      <div class="garden-stats">
+        <div class="garden-stat">
+          <div class="garden-stat-num">{total}</div>
+          <div class="garden-stat-label">书目</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{extractedCount}</div>
+          <div class="garden-stat-label">已榨取</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{syntheses.length}</div>
+          <div class="garden-stat-label">复盘</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{categories.length}</div>
+          <div class="garden-stat-label">分类</div>
+        </div>
+      </div>
+
+      <!-- Recent runs -->
+      <section>
+        <h2 class="garden-section-title">
+          <span class="garden-accent-bar"></span>最近运行
+        </h2>
+        {
+          recentLog.length === 0 ? (
+            <p class="garden-empty">
+              <span class="garden-empty-title">暂无运行记录</span>
+              Agent runner 运行后会在此追加日志。
+            </p>
+          ) : (
+            <div class="garden-log">
+              {recentLog.map((entry) => (
+                <div class="garden-log-row">
+                  <span class="garden-log-time">{entry.time}</span>
+                  <span class="garden-log-action">{entry.action}</span>
+                  <span class="garden-log-detail">{entry.detail}</span>
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </section>
+
+      <p style="margin-top:2.5rem;">
+        <a href="/garden/graph">查看关联图谱 →</a>
+        {' · '}
+        <a href="/syntheses">跨书复盘 →</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>

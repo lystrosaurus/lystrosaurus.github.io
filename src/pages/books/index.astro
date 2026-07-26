@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookCard from '../../components/BookCard.astro';
+import { books, categories } from '../../data/books';
+import '../../styles/garden.css';
+
+const total = books.length;
+const extractedCount = books.filter((b) => b.extracted).length;
+const pendingCount = total - extractedCount;
+const categoryCount = categories.length;
+
+// Pre-compute the category lookup so the card grid can resolve each book's tag.
+const categoryMap = new Map(categories.map((c) => [c.id, c]));
+---
+
+<BaseLayout title="书库" description="知识花园 · 书库：以书为核心的结构化知识资产">
+  <div class="garden-root">
+    <div class="garden-container">
+      <h1 class="garden-page-title">智识花园 · 书库</h1>
+      <p class="garden-page-subtitle">
+        已藏书 <span class="garden-accent-text">{total}</span> 本 ·
+        <span class="garden-accent-text">{extractedCount}</span> 本已榨取 ·
+        <span class="garden-accent-text">{categoryCount}</span> 个分类
+      </p>
+
+      <!-- Stats -->
+      <div class="garden-stats">
+        <div class="garden-stat">
+          <div class="garden-stat-num">{total}</div>
+          <div class="garden-stat-label">书目总数</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{extractedCount}</div>
+          <div class="garden-stat-label">已榨取</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{pendingCount}</div>
+          <div class="garden-stat-label">待榨取</div>
+        </div>
+        <div class="garden-stat">
+          <div class="garden-stat-num">{categoryCount}</div>
+          <div class="garden-stat-label">分类</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="garden-filters">
+        <div class="garden-filter-group" id="cat-filter">
+          <span class="garden-filter-label">分类</span>
+          <button type="button" class="garden-chip garden-chip-active" data-cat="">全部</button>
+          {
+            categories.map((c) => (
+              <button type="button" class="garden-chip" data-cat={c.id}>
+                {c.icon} {c.name}
+              </button>
+            ))
+          }
+        </div>
+        <div class="garden-filter-group" id="status-filter">
+          <span class="garden-filter-label">状态</span>
+          <button type="button" class="garden-chip garden-chip-active" data-status="">全部</button>
+          <button type="button" class="garden-chip" data-status="1">已榨取</button>
+          <button type="button" class="garden-chip" data-status="0">待榨取</button>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="garden-grid" id="book-grid">
+        {
+          books.map((book) => {
+            const cat = categoryMap.get(book.category);
+            if (!cat) return null;
+            return (
+              <div
+                class="garden-grid-item"
+                data-category={book.category}
+                data-extracted={book.extracted ? '1' : '0'}
+              >
+                <BookCard book={book} category={cat} />
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  type GridItem = HTMLElement & { dataset: DOMStringMap };
+
+  const items = Array.from(
+    document.querySelectorAll<GridItem>('#book-grid .garden-grid-item'),
+  );
+  const catChips = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('#cat-filter .garden-chip'),
+  );
+  const statusChips = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('#status-filter .garden-chip'),
+  );
+
+  let activeCat = '';
+  let activeStatus = '';
+
+  function apply(): void {
+    for (const el of items) {
+      const okCat = activeCat === '' || el.dataset.category === activeCat;
+      const okStatus = activeStatus === '' || el.dataset.extracted === activeStatus;
+      el.style.display = okCat && okStatus ? '' : 'none';
+    }
+  }
+
+  function bind(
+    chips: HTMLButtonElement[],
+    getter: () => string,
+    setter: (v: string) => void,
+  ): void {
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const value = chip.dataset.cat ?? chip.dataset.status ?? '';
+        setter(getter() === value ? '' : value);
+        chips.forEach((c) => c.classList.remove('garden-chip-active'));
+        if (getter() !== '') {
+          chip.classList.add('garden-chip-active');
+        } else {
+          chips[0].classList.add('garden-chip-active');
+        }
+        apply();
+      });
+    });
+  }
+
+  bind(catChips, () => activeCat, (v) => (activeCat = v));
+  bind(statusChips, () => activeStatus, (v) => (activeStatus = v));
+
+  apply();
+</script>

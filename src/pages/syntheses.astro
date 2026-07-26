@@ -1,0 +1,53 @@
+---
+/**
+ * /syntheses —— 跨书复盘列表页。
+ *
+ * 展示每条复盘的标题 / 主题 / 摘要 / 要点，以及可点击跳转到对应书目详情的
+ * 书名标签。当 syntheses 为空时展示空状态。所有动态文本经 escapeHtml /
+ * renderInlineMarkdown 处理（XSS 安全）。
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/garden.css';
+import { books, syntheses } from '../data/books';
+import { escapeHtml, renderInlineMarkdown } from '../utils/garden';
+
+const bookMap = new Map(books.map((b) => [b.id, b]));
+---
+
+<BaseLayout title="跨书复盘" description="知识花园 · 跨书复盘：把多本书连成一张思维网">
+  <div class="garden-root">
+    <div class="garden-container">
+      <h1 class="garden-page-title">跨书复盘</h1>
+      <p class="garden-page-subtitle">把不同书的洞见连成可复用的思维网络。</p>
+
+      {syntheses.length === 0 ? (
+        <div class="garden-empty">
+          <div class="garden-empty-title">📭 尚未生成复盘</div>
+          <p>当多本书籍被榨取后，Agent 会自动生成跨书复盘。</p>
+        </div>
+      ) : (
+        syntheses.map((s) => (
+          <div class="garden-synthesis-card">
+            <div class="garden-synthesis-title" set:html={escapeHtml(s.title)}></div>
+            <div class="garden-synthesis-theme" set:html={escapeHtml(s.theme)}></div>
+            <div class="garden-synthesis-summary" set:html={renderInlineMarkdown(s.summary)}></div>
+
+            <ul class="garden-list">
+              {s.points.map((p) => <li set:html={renderInlineMarkdown(p)}></li>)}
+            </ul>
+
+            <div style="margin-top:1rem">
+              {s.bookIds.map((id) => {
+                const b = bookMap.get(id);
+                if (!b) return null;
+                return (
+                  <a href={`/books/${b.id}`} class="garden-book-tag" set:html={escapeHtml(b.title)}></a>
+                );
+              })}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+</BaseLayout>
