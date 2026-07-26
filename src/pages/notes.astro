@@ -1,0 +1,279 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="笔记" description="个人笔记管理：Markdown 编辑、实时预览、搜索与导入导出">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <div class="mb-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        <span class="text-cyan">#</span> 笔记
+      </h1>
+      <p class="text-text-muted text-lg">本地 Markdown 笔记 · CRUD · 搜索 · 导入 / 导出</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="note-toolbar">
+      <input
+        id="note-search"
+        type="text"
+        class="input-field flex-1 min-w-[200px]"
+        placeholder="搜索标题、内容或标签..."
+        aria-label="搜索笔记"
+      />
+      <button id="btn-new" class="btn-primary whitespace-nowrap">+ 新建</button>
+      <button id="btn-export" class="btn-secondary whitespace-nowrap">⬇ 导出</button>
+      <button id="btn-import" class="btn-secondary whitespace-nowrap">⬆ 导入</button>
+      <input id="import-file" type="file" accept="application/json,.json" class="hidden" />
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
+      <!-- Note list -->
+      <div>
+        <h2 class="text-sm font-mono text-text-muted mb-3">
+          笔记列表 (<span id="note-count">0</span>)
+        </h2>
+        <div id="note-list" class="space-y-2"></div>
+      </div>
+
+      <!-- Editor -->
+      <div>
+        <div class="space-y-3">
+          <input id="note-title" type="text" class="input-field" placeholder="标题" aria-label="笔记标题" />
+          <input id="note-tags" type="text" class="input-field" placeholder="标签，逗号分隔，如：前端, 随笔" aria-label="笔记标签" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 note-editor">
+            <textarea id="note-content" placeholder="开始写点什么...支持 Markdown" aria-label="笔记正文"></textarea>
+            <div id="note-preview" class="note-preview prose prose-invert max-w-none"></div>
+          </div>
+          <div class="flex gap-3">
+            <button id="btn-save" class="btn-primary flex-1">保存</button>
+            <button id="btn-delete" class="btn-secondary">删除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="note-empty" class="text-center py-10 text-text-muted hidden">
+      <p class="text-lg mb-1">还没有笔记</p>
+      <p class="font-mono text-sm">点击「+ 新建」开始记录</p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { marked } from 'marked';
+  import { escapeHtml } from '../utils/dom';
+
+  /** A single note stored in localStorage under the `km_notes` key. */
+  interface Note {
+    id: string;
+    title: string;
+    content: string;
+    tags: string[];
+    createdAt: number;
+    updatedAt: number;
+    pinned?: boolean;
+  }
+
+  const STORAGE_KEY = 'km_notes';
+
+  let notes: Note[] = [];
+  let currentId: string | null = null;
+
+  const listEl = document.getElementById('note-list')!;
+  const countEl = document.getElementById('note-count')!;
+  const emptyEl = document.getElementById('note-empty')!;
+  const searchEl = document.getElementById('note-search') as HTMLInputElement;
+  const titleEl = document.getElementById('note-title') as HTMLInputElement;
+  const tagsEl = document.getElementById('note-tags') as HTMLInputElement;
+  const contentEl = document.getElementById('note-content') as HTMLTextAreaElement;
+  const previewEl = document.getElementById('note-preview')!;
+  const importFileEl = document.getElementById('import-file') as HTMLInputElement;
+
+  /** Load notes from localStorage (defensive against corrupted data). */
+  function load(): void {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      notes = raw ? (JSON.parse(raw) as Note[]) : [];
+    } catch {
+      notes = [];
+    }
+  }
+
+  /** Persist the current notes array. */
+  function save(): void {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  }
+
+  /** Format a timestamp as a compact, locale-stable string. */
+  function formatDate(ts: number): string {
+    const d = new Date(ts);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  /** Pinned notes first, then most-recently-updated. */
+  function sortedNotes(): Note[] {
+    return [...notes].sort((a, b) => {
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      return b.updatedAt - a.updatedAt;
+    });
+  }
+
+  /** Render the note list, honouring the internal search box. */
+  function renderList(): void {
+    const q = searchEl.value.trim().toLowerCase();
+    const filtered = sortedNotes().filter((n) => {
+      if (!q) return true;
+      const hay = `${n.title} ${n.content} ${(n.tags || []).join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    });
+
+    countEl.textContent = String(notes.length);
+    emptyEl.classList.toggle('hidden', notes.length > 0);
+
+    listEl.innerHTML = filtered.map((n) => {
+      const tagHtml =
+        n.tags && n.tags.length
+          ? n.tags.map((t) => '#' + escapeHtml(t)).join(' ')
+          : '<span class="text-text-muted">无标签</span>';
+      return `
+        <div class="note-card ${n.id === currentId ? 'note-card-active' : ''}" data-id="${escapeHtml(n.id)}">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-text-primary font-semibold truncate">${escapeHtml(n.title || '无标题')}</h3>
+            ${n.pinned ? '<span class="text-cyan text-xs">📌</span>' : ''}
+          </div>
+          <div class="text-xs font-mono text-cyan mt-1">${tagHtml}</div>
+          <div class="text-xs text-text-muted mt-1">${formatDate(n.updatedAt)}</div>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll<HTMLElement>('.note-card').forEach((el) => {
+      el.addEventListener('click', () => loadNote(el.dataset.id!));
+    });
+  }
+
+  /** Render the live Markdown preview (escape first, then parse). */
+  function renderPreview(): void {
+    previewEl.innerHTML = marked.parse(escapeHtml(contentEl.value)) as string;
+  }
+
+  /** Load a note into the editor. */
+  function loadNote(id: string): void {
+    const note = notes.find((n) => n.id === id);
+    if (!note) return;
+    currentId = id;
+    titleEl.value = note.title;
+    tagsEl.value = (note.tags || []).join(', ');
+    contentEl.value = note.content;
+    renderPreview();
+    renderList();
+  }
+
+  /** Reset the editor for a brand-new note. */
+  function newNote(): void {
+    currentId = null;
+    titleEl.value = '';
+    tagsEl.value = '';
+    contentEl.value = '';
+    renderPreview();
+    titleEl.focus();
+    renderList();
+  }
+
+  /** Create or update the currently edited note. */
+  function saveNote(): void {
+    const title = titleEl.value.trim();
+    const content = contentEl.value;
+    if (!title && !content) return;
+
+    const tags = tagsEl.value.split(',').map((t) => t.trim()).filter(Boolean);
+    const now = Date.now();
+
+    if (currentId) {
+      const note = notes.find((n) => n.id === currentId);
+      if (note) {
+        note.title = title;
+        note.content = content;
+        note.tags = tags;
+        note.updatedAt = now;
+      }
+    } else {
+      const id = 'n_' + now.toString(36) + Math.random().toString(36).slice(2, 6);
+      notes.push({ id, title, content, tags, createdAt: now, updatedAt: now });
+      currentId = id;
+    }
+
+    save();
+    renderList();
+  }
+
+  /** Delete the currently edited note after confirmation. */
+  function deleteNote(): void {
+    if (!currentId) return;
+    if (!confirm('确定删除这条笔记吗？')) return;
+    notes = notes.filter((n) => n.id !== currentId);
+    currentId = null;
+    titleEl.value = '';
+    tagsEl.value = '';
+    contentEl.value = '';
+    renderPreview();
+    save();
+    renderList();
+  }
+
+  /** Download all notes as a JSON file. */
+  function exportNotes(): void {
+    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'notes.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /** Import notes from a JSON file, upserting by id (import wins on conflict). */
+  function importNotes(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const incoming = JSON.parse(String(reader.result)) as Note[];
+        if (!Array.isArray(incoming)) throw new Error('invalid');
+        const map = new Map(notes.map((n) => [n.id, n] as const));
+        for (const n of incoming) {
+          if (n && n.id) map.set(n.id, n);
+        }
+        notes = [...map.values()];
+        save();
+        renderList();
+      } catch {
+        alert('导入失败：文件格式不正确');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ---- Wire up events ----
+  document.getElementById('btn-new')!.addEventListener('click', newNote);
+  document.getElementById('btn-save')!.addEventListener('click', saveNote);
+  document.getElementById('btn-delete')!.addEventListener('click', deleteNote);
+  document.getElementById('btn-export')!.addEventListener('click', exportNotes);
+  document.getElementById('btn-import')!.addEventListener('click', () => importFileEl.click());
+  importFileEl.addEventListener('change', () => {
+    const file = importFileEl.files?.[0];
+    if (file) importNotes(file);
+    importFileEl.value = '';
+  });
+
+  contentEl.addEventListener('input', renderPreview);
+  searchEl.addEventListener('input', renderList);
+
+  // ---- Init ----
+  load();
+  renderList();
+  renderPreview();
+</script>

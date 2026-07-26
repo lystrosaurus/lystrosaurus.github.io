@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
+import TagFilter from '../../components/TagFilter.astro';
+import { categoryColor } from '@/utils/category';
 
 const entries = (await getCollection('wiki'))
   .filter((entry) => !entry.data.draft)
@@ -9,39 +11,50 @@ const entries = (await getCollection('wiki'))
 
 const categories = [...new Set(entries.map((entry) => entry.data.category))];
 
-const categoryColors: Record<string, string> = {
-  '前端': 'cyan',
-  '后端': 'purple',
-  '工具': 'pink-500',
-};
+// Unique, sorted list of every tag used across the knowledge base.
+const allTags = [...new Set(entries.flatMap((entry) => entry.data.tags))].sort();
 ---
 
 <BaseLayout title="知识库" description="系统性的笔记与速查手册">
   <div class="max-w-6xl mx-auto px-4 py-12">
     <!-- Header -->
-    <div class="mb-12">
+    <div class="mb-8">
       <h1 class="text-4xl md:text-5xl font-bold mb-4">
         <span class="text-purple">#</span> 知识库
       </h1>
       <p class="text-text-muted text-lg">系统性的笔记与速查手册</p>
     </div>
 
+    <!-- Tag Filter -->
+    <TagFilter tags={allTags} />
+
     <!-- Categories -->
-    <div class="space-y-12">
+    <div class="space-y-12 mt-10">
       {categories.map((category) => {
         const categoryEntries = entries.filter((e) => e.data.category === category);
-        const color = categoryColors[category] || 'cyan';
+        const color = categoryColor(category);
         return (
           <section>
-            <h2 class={`text-2xl font-bold mb-6 text-${color}`}>
+            <h2
+              class="text-2xl font-bold mb-6 flex items-center gap-2"
+              style={`color:${color}`}
+            >
+              <span
+                class="w-2.5 h-2.5 rounded-full inline-block"
+                style={`background:${color}`}
+              ></span>
               {category}
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categoryEntries.map((entry) => (
-                <Card href={`/wiki/${entry.id}`}>
+                <Card
+                  href={`/wiki/${entry.id}`}
+                  class="wiki-card"
+                  data-category={entry.data.category}
+                  data-tags={entry.data.tags.join(',')}
+                >
                   <div class="flex flex-col h-full">
                     <div class="flex items-center gap-2 mb-3">
-                      <span class={`w-2 h-2 rounded-full bg-${color}`}></span>
                       <span class="text-xs font-mono text-text-muted">{entry.data.tags.join(', ')}</span>
                     </div>
                     <h3 class="text-lg font-semibold text-text-primary mb-2">{entry.data.title}</h3>
@@ -63,3 +76,28 @@ const categoryColors: Record<string, string> = {
     )}
   </div>
 </BaseLayout>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.tag-chip[data-tag]');
+  const cards = document.querySelectorAll<HTMLElement>('.wiki-card[data-tags]');
+
+  function applyFilter(active: string): void {
+    cards.forEach((card) => {
+      const tags = (card.dataset.tags || '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const matched = active === '' || tags.includes(active);
+      card.classList.toggle('hidden', !matched);
+    });
+  }
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const active = chip.dataset.tag || '';
+      chips.forEach((c) => c.classList.remove('tag-chip-active'));
+      chip.classList.add('tag-chip-active');
+      applyFilter(active);
+    });
+  });
+</script>

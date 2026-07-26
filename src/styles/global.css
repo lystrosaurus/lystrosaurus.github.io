@@ -123,6 +123,49 @@
            focus:outline-none focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30
            transition-all duration-300;
   }
+
+  /* ---- Tag filter (knowledge base) ---- */
+  .tag-filter-bar {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .tag-chip {
+    @apply px-3 py-1.5 rounded-full text-sm font-mono
+           bg-bg-secondary/80 backdrop-blur-md border border-border
+           text-text-secondary
+           hover:border-cyan/50 hover:text-cyan
+           transition-all duration-300 cursor-pointer select-none;
+  }
+
+  .tag-chip-active {
+    @apply border-cyan/50 text-cyan bg-cyan/10;
+  }
+
+  /* ---- Notes manager ---- */
+  .note-toolbar {
+    @apply flex flex-wrap items-center gap-3;
+  }
+
+  .note-card {
+    @apply p-4 rounded-xl bg-bg-secondary/80 backdrop-blur-md border border-border
+           transition-all duration-300 cursor-pointer
+           hover:border-cyan/50;
+  }
+
+  .note-card-active {
+    @apply border-cyan/50 bg-cyan/5;
+  }
+
+  .note-editor textarea {
+    @apply w-full h-80 p-4 bg-bg-tertiary border border-border rounded-lg
+           text-text-primary placeholder-text-muted font-mono text-sm
+           focus:outline-none focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30
+           resize-y;
+  }
+
+  .note-preview {
+    @apply h-80 overflow-auto p-4 bg-bg-tertiary border border-border rounded-lg;
+  }
 }
 
 @layer utilities {

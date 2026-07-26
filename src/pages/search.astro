@@ -1,0 +1,169 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const blogEntries = await getCollection('blog');
+const wikiEntries = await getCollection('wiki');
+
+interface SearchItem {
+  type: 'blog' | 'wiki' | 'tool';
+  title: string;
+  description: string;
+  tags: string[];
+  category?: string;
+  url: string;
+}
+
+/**
+ * Unified search index across the whole site. Blog and wiki items are pulled
+ * from the content collections at build time; tool items are static mirrors of
+ * the entries listed on /tools so they are discoverable from search too.
+ */
+const searchIndex: SearchItem[] = [
+  ...blogEntries
+    .filter((e) => !e.data.draft)
+    .map((e) => ({
+      type: 'blog' as const,
+      title: e.data.title,
+      description: e.data.description,
+      tags: e.data.tags,
+      url: '/blog/' + e.id,
+    })),
+  ...wikiEntries
+    .filter((e) => !e.data.draft)
+    .map((e) => ({
+      type: 'wiki' as const,
+      title: e.data.title,
+      description: e.data.description,
+      tags: e.data.tags,
+      category: e.data.category,
+      url: '/wiki/' + e.id,
+    })),
+  { type: 'tool', title: 'JSON 格式化', description: '格式化、压缩和验证 JSON 数据', tags: ['JSON', '开发'], url: '/tools/json-formatter' },
+  { type: 'tool', title: 'Base64 编解码', description: 'Base64 编码与解码转换', tags: ['Base64', '编码'], url: '/tools/base64' },
+  { type: 'tool', title: '时间戳转换', description: 'Unix 时间戳与日期时间互转', tags: ['时间戳', '开发'], url: '/tools/timestamp' },
+  { type: 'tool', title: '正则表达式测试', description: '实时测试正则表达式匹配', tags: ['正则', '开发'], url: '/tools/regex-tester' },
+  { type: 'tool', title: 'Markdown 预览', description: '实时预览 Markdown 渲染效果', tags: ['Markdown', '写作'], url: '/tools/markdown-preview' },
+  { type: 'tool', title: '番茄钟', description: '专注计时器，提升工作效率', tags: ['番茄钟', '效率'], url: '/tools/pomodoro' },
+  { type: 'tool', title: '待办清单', description: '简单的任务管理工具', tags: ['待办', '效率'], url: '/tools/todo' },
+];
+---
+
+<BaseLayout title="搜索" description="全站搜索：博客、知识库与工具">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">
+      <span class="neon-text">⌕</span> 搜索
+    </h1>
+
+    <input
+      id="search-input"
+      type="text"
+      class="input-field text-lg"
+      placeholder="搜索博客、知识库或工具...（按 ⌘K / Ctrl+K 快速唤起）"
+      autofocus
+    />
+
+    <div id="search-results" class="mt-8 space-y-8"></div>
+  </div>
+</BaseLayout>
+
+<!-- Search index injected as a JSON data-island (robust alternative to
+     define:vars that works with TypeScript / imported client scripts). -->
+<script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex)}></script>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  interface SearchItem {
+    type: 'blog' | 'wiki' | 'tool';
+    title: string;
+    description: string;
+    tags: string[];
+    category?: string;
+    url: string;
+  }
+
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const results = document.getElementById('search-results')!;
+
+  const searchIndex: SearchItem[] = JSON.parse(
+    document.getElementById('search-index')!.textContent || '[]',
+  );
+
+  const fuse = new Fuse<SearchItem>(searchIndex, {
+    keys: ['title', 'description', 'tags', 'category'],
+    threshold: 0.4,
+    includeMatches: true,
+  });
+
+  const GROUP_LABELS: Record<string, string> = {
+    blog: '博客',
+    wiki: '知识库',
+    tool: '工具',
+  };
+
+  const GROUP_ORDER: string[] = ['blog', 'wiki', 'tool'];
+
+  function escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function render(items: SearchItem[]): void {
+    if (items.length === 0) {
+      results.innerHTML = '<p class="text-text-muted">没有找到相关结果。</p>';
+      return;
+    }
+
+    const groups: Record<string, SearchItem[]> = {};
+    for (const item of items) {
+      (groups[item.type] ||= []).push(item);
+    }
+
+    results.innerHTML = GROUP_ORDER.filter((t) => groups[t]?.length).map((type) => {
+      const cards = groups[type].map((item) => `
+        <a href="${item.url}" class="block glass-card-hover p-5 rounded-xl">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-mono px-2 py-0.5 rounded-full border border-cyan/30 text-cyan">${GROUP_LABELS[type]}</span>
+            ${item.category ? `<span class="text-xs font-mono text-text-muted">${escapeHtml(item.category)}</span>` : ''}
+          </div>
+          <h3 class="text-lg font-semibold text-text-primary">${escapeHtml(item.title)}</h3>
+          <p class="text-text-secondary text-sm mt-1">${escapeHtml(item.description)}</p>
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            ${item.tags.map((t) => `<span class="text-xs font-mono text-purple">#${escapeHtml(t)}</span>`).join('')}
+          </div>
+        </a>
+      `).join('');
+
+      return `
+        <section>
+          <h2 class="text-sm font-mono text-text-muted mb-3 uppercase tracking-wider">${GROUP_LABELS[type]}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${cards}</div>
+        </section>
+      `;
+    }).join('');
+  }
+
+  function run(): void {
+    const q = input.value.trim();
+    if (!q) {
+      render(searchIndex);
+      return;
+    }
+    const res = fuse.search(q);
+    render(res.map((r) => r.item));
+  }
+
+  input.addEventListener('input', run);
+
+  // Prefill from ?q= and run an initial search.
+  const params = new URLSearchParams(location.search);
+  const initial = params.get('q');
+  if (initial) {
+    input.value = initial;
+  }
+  run();
+</script>

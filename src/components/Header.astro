@@ -1,18 +1,21 @@
 ---
+import SearchBox from './SearchBox.astro';
+
 const navItems = [
   { href: '/', label: '首页', icon: '🏠' },
   { href: '/blog', label: '博客', icon: '📝' },
   { href: '/wiki', label: '知识库', icon: '📚' },
   { href: '/tools', label: '工具', icon: '🛠' },
+  { href: '/notes', label: '笔记', icon: '📒' },
 ];
 
 const currentPath = Astro.url.pathname;
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border">
-  <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+  <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
     <!-- Logo -->
-    <a href="/" class="flex items-center gap-2 group">
+    <a href="/" class="flex items-center gap-2 group shrink-0">
       <span class="text-2xl font-bold neon-text font-mono">L</span>
       <span class="text-text-primary group-hover:text-cyan transition-colors">Lystrosaurus</span>
     </a>
@@ -37,16 +40,30 @@ const currentPath = Astro.url.pathname;
       ))}
     </ul>
 
-    <!-- Mobile Menu Button -->
-    <button
-      id="mobile-menu-btn"
-      class="md:hidden p-2 text-text-secondary hover:text-text-primary"
-      aria-label="Toggle menu"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+    <!-- Desktop Search -->
+    <SearchBox />
+
+    <!-- Mobile actions -->
+    <div class="flex items-center gap-1 md:hidden">
+      <button
+        id="mobile-search-btn"
+        class="p-2 text-text-secondary hover:text-text-primary"
+        aria-label="搜索"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+        </svg>
+      </button>
+      <button
+        id="mobile-menu-btn"
+        class="p-2 text-text-secondary hover:text-text-primary"
+        aria-label="切换菜单"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
   </nav>
 
   <!-- Mobile Menu -->
@@ -78,5 +95,18 @@ const currentPath = Astro.url.pathname;
 
   btn?.addEventListener('click', () => {
     menu?.classList.toggle('hidden');
+  });
+
+  const mobileSearchBtn = document.getElementById('mobile-search-btn');
+  mobileSearchBtn?.addEventListener('click', () => {
+    location.href = '/search';
+  });
+
+  // Global ⌘K / Ctrl+K shortcut to focus search.
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      location.href = '/search';
+    }
   });
 </script>

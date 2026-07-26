@@ -1,0 +1,35 @@
+---
+/**
+ * Presentational tag filter bar.
+ *
+ * Renders a row of clickable chips (including an "全部" reset chip). Each chip
+ * carries a `data-tag` attribute; the filtering behaviour itself is implemented
+ * by the consuming page's client script via event delegation. The optional
+ * `active` prop controls the initial highlighted chip.
+ */
+interface Props {
+  tags: string[];
+  active?: string;
+}
+
+const { tags, active = '' } = Astro.props;
+---
+
+<div class="tag-filter-bar">
+  <button
+    type="button"
+    class:list={['tag-chip', active === '' && 'tag-chip-active']}
+    data-tag=""
+  >
+    全部
+  </button>
+  {tags.map((tag) => (
+    <button
+      type="button"
+      class:list={['tag-chip', active === tag && 'tag-chip-active']}
+      data-tag={tag}
+    >
+      {tag}
+    </button>
+  ))}
+</div>

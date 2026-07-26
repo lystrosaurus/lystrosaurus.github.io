@@ -33,6 +33,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build observability
+        run: |
+          echo "--- Astro version ---"
+          npx astro --version
+          echo "--- dist size ---"
+          du -sh dist 2>/dev/null || true
+          ls -la dist
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
