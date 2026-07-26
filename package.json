@@ -11,8 +11,8 @@
     "garden:run": "node --experimental-strip-types scripts/knowledge-garden-agent.mjs"
   },
   "dependencies": {
-    "astro": "^6.3.3",
-    "@astrojs/mdx": "^5.0.6",
+    "astro": "^7.1.3",
+    "@astrojs/mdx": "^7.0.3",
     "tailwindcss": "^4.3.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tailwindcss/typography": "^0.5.19",
