@@ -35,3 +35,9 @@ build_xss.log
 commit_xss.txt
 git_status.txt
 dist_old_bak/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

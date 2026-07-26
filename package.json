@@ -6,22 +6,28 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "garden:validate": "node --experimental-strip-types scripts/validate-books.mjs",
-    "garden:run": "node --experimental-strip-types scripts/knowledge-garden-agent.mjs"
+    "garden:run": "node --experimental-strip-types scripts/knowledge-garden-agent.mjs",
+    "generate-types": "wrangler types",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
-    "astro": "^7.0.6",
+    "@astrojs/cloudflare": "^14.1.4",
     "@astrojs/mdx": "^7.0.3",
-    "tailwindcss": "^4.3.0",
-    "@tailwindcss/vite": "^4.3.0",
     "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.3.0",
+    "astro": "^7.0.6",
     "fuse.js": "^7.0.0",
-    "marked": "^12.0.0"
+    "marked": "^12.0.0",
+    "tailwindcss": "^4.3.0"
   },
   "overrides": {
     "vite": "^8.0.13",
     "esbuild": "^0.28.1",
     "postcss": "^8.5.18"
+  },
+  "devDependencies": {
+    "wrangler": "^4.114.0"
   }
 }
