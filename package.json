@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run gen:books && astro build",
     "preview": "npm run build && wrangler dev",
     "garden:validate": "node --experimental-strip-types scripts/validate-books.mjs",
     "garden:run": "node --experimental-strip-types scripts/knowledge-garden-agent.mjs",
+    "gen:books": "node --experimental-strip-types scripts/gen-books-json.mjs",
     "generate-types": "wrangler types",
     "deploy": "npm run build && wrangler deploy"
   },
