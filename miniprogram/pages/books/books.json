@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "book-card": "/components/book-card/book-card"
+  },
+  "navigationBarTitleText": "智识花园 · 书库",
+  "enablePullDownRefresh": true,
+  "backgroundColorTop": "#0a0a0a",
+  "backgroundColorBottom": "#0a0a0a"
+}

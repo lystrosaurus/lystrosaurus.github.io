@@ -1,0 +1,11 @@
+<view class="bc-card" bindtap="onTap" hover-class="bc-hover">
+  <view class="bc-title">{{book.title}}</view>
+  <view class="bc-meta">{{book.author}} · {{book.year}}</view>
+  <view class="bc-summary">{{book.summary}}</view>
+  <view class="bc-footer">
+    <text class="bc-tag" style="color:{{catColor}}">{{category.icon}} {{category.name}}</text>
+    <text class="bc-badge {{book.extracted ? 'bc-done' : 'bc-pending'}}">
+      {{book.extracted ? '✓ 已榨取' : '⏳ 待榨取'}}
+    </text>
+  </view>
+</view>

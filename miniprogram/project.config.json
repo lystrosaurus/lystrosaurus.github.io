@@ -1,0 +1,20 @@
+{
+  "description": "智识花园书库 · 微信小程序（个人阅读）",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "bigPackageSizeSupport": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.5.0",
+  "appid": "touristappid",
+  "projectname": "knowledge-garden-miniprogram",
+  "condition": {}
+}

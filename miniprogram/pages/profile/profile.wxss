@@ -1,0 +1,88 @@
+.prof-head {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 28rpx;
+}
+.card {
+  margin-bottom: 22rpx;
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #f2f2f2;
+  margin-bottom: 18rpx;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #1e1e1e;
+}
+.row:last-of-type {
+  border-bottom: none;
+}
+.row-label {
+  font-size: 26rpx;
+  color: #b8b8b8;
+}
+.row-val {
+  font-size: 26rpx;
+  color: #e8e8e8;
+}
+.row-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+.ctrl-btn {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  background: #1a1a1a;
+  border: 1rpx solid #333;
+  border-radius: 14rpx;
+  color: #00fff2;
+  font-size: 28rpx;
+}
+.ctrl-val {
+  font-size: 28rpx;
+  color: #f2f2f2;
+  min-width: 48rpx;
+  text-align: center;
+}
+.theme-switch {
+  font-size: 24rpx;
+  padding: 12rpx 26rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #333;
+}
+.on-dark {
+  color: #00fff2;
+  border-color: #00fff2;
+}
+.on-light {
+  color: #c8a96a;
+  border-color: #c8a96a;
+}
+.sync-btn {
+  margin-top: 20rpx;
+}
+.sync-note {
+  font-size: 20rpx;
+  color: #6a6a6a;
+  margin-top: 12rpx;
+  line-height: 1.6;
+}
+.about {
+  font-size: 24rpx;
+  color: #9a9a9a;
+  line-height: 1.75;
+}
+.about-link {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #ff8a8a;
+}

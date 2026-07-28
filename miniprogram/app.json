@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/books/books",
+    "pages/book-detail/book-detail",
+    "pages/reader/reader",
+    "pages/shelf/shelf",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "智识花园 · 书库",
+    "navigationBarBackgroundColor": "#0a0a0a",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a0a0a",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#00fff2",
+    "backgroundColor": "#111111",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/books/books", "text": "书库" },
+      { "pagePath": "pages/shelf/shelf", "text": "书架" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

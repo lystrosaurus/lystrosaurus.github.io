@@ -41,3 +41,10 @@ dist_old_bak/
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# Generated data (single source: src/data/books.ts, via `npm run gen:books`)
+public/api/books.json
+miniprogram/data/books.local.json
+
+# Tool / agent internal state
+.workbuddy/

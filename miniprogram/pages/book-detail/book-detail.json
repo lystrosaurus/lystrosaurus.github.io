@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "book-card": "/components/book-card/book-card"
+  },
+  "navigationBarTitleText": "书籍详情"
+}

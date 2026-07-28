@@ -1,0 +1,41 @@
+<view class="page">
+  <!-- 统计 -->
+  <view class="stats">
+    <view class="stat"><view class="stat-num">{{stats.total}}</view><view class="stat-label">书目</view></view>
+    <view class="stat"><view class="stat-num accent-text">{{stats.extracted}}</view><view class="stat-label">已榨取</view></view>
+    <view class="stat"><view class="stat-num">{{stats.pending}}</view><view class="stat-label">待榨取</view></view>
+  </view>
+
+  <!-- 搜索 -->
+  <view class="search-box">
+    <text class="search-ico">⌕</text>
+    <input class="search-input" placeholder="搜索书名 / 作者 / 简介" placeholder-class="search-ph" value="{{keyword}}" bindinput="onSearch" confirm-type="search" />
+  </view>
+
+  <!-- 分类筛选 -->
+  <scroll-view class="chips" scroll-x="true">
+    <view class="chip {{activeCat==='' ? 'chip-on':''}}" bindtap="setCat" data-cat="">全部</view>
+    <view wx:for="{{categories}}" wx:key="id" class="chip {{activeCat===item.id ? 'chip-on':''}}" bindtap="setCat" data-cat="{{item.id}}">
+      {{item.icon}} {{item.name}}
+    </view>
+  </scroll-view>
+
+  <!-- 状态筛选 -->
+  <view class="status-row">
+    <view class="chip-sm {{activeStatus==='' ? 'chip-on':''}}" bindtap="setStatus" data-status="">全部</view>
+    <view class="chip-sm {{activeStatus==='1' ? 'chip-on':''}}" bindtap="setStatus" data-status="1">已榨取</view>
+    <view class="chip-sm {{activeStatus==='0' ? 'chip-on':''}}" bindtap="setStatus" data-status="0">待榨取</view>
+    <text class="result-count">共 {{resultCount}} 本</text>
+  </view>
+
+  <!-- 列表 -->
+  <view wx:if="{{filtered.length}}" class="grid">
+    <view wx:for="{{filtered}}" wx:key="id" class="grid-item">
+      <book-card book="{{item}}" category="{{item.category}}" bind:tap="onCardTap" />
+    </view>
+  </view>
+  <view wx:else class="empty">
+    <text class="empty-title">没有匹配的书目</text>
+    <text>试试切换分类或清空搜索词</text>
+  </view>
+</view>

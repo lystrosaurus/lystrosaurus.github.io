@@ -1,0 +1,101 @@
+.stats {
+  display: flex;
+  gap: 18rpx;
+  margin-bottom: 24rpx;
+}
+.stat {
+  flex: 1;
+  background: #111111;
+  border: 1rpx solid #2a2a2a;
+  border-radius: 18rpx;
+  padding: 22rpx 0;
+  text-align: center;
+}
+.stat-num {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+}
+.stat-label {
+  font-size: 20rpx;
+  color: #8a8a8a;
+  margin-top: 4rpx;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #111111;
+  border: 1rpx solid #2a2a2a;
+  border-radius: 999rpx;
+  padding: 0 24rpx;
+  margin-bottom: 20rpx;
+}
+.search-ico {
+  color: #00fff2;
+  font-size: 34rpx;
+  margin-right: 12rpx;
+}
+.search-input {
+  flex: 1;
+  height: 76rpx;
+  color: #e8e8e8;
+  font-size: 28rpx;
+}
+.search-ph {
+  color: #6a6a6a;
+}
+
+.chips {
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+}
+.chip {
+  display: inline-block;
+  padding: 12rpx 24rpx;
+  margin-right: 14rpx;
+  background: #111111;
+  border: 1rpx solid #2a2a2a;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: #b8b8b8;
+}
+.chip-on {
+  background: rgba(0, 255, 242, 0.12);
+  border-color: #00fff2;
+  color: #00fff2;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-bottom: 24rpx;
+}
+.chip-sm {
+  padding: 10rpx 20rpx;
+  background: #111111;
+  border: 1rpx solid #2a2a2a;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #b8b8b8;
+}
+.chip-sm.chip-on {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: #a855f7;
+  color: #c89bff;
+}
+.result-count {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: #8a8a8a;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+}
+.grid-item {
+  display: flex;
+}

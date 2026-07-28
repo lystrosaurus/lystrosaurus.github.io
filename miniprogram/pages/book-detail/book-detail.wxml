@@ -1,0 +1,79 @@
+<view class="page">
+  <!-- 头部 -->
+  <view class="detail-header">
+    <view class="detail-title">{{book.title}}</view>
+    <view class="detail-meta">
+      <text class="accent-text">{{book.author}}</text>
+      <text class="dim"> · {{book.year}} · </text>
+      <text style="color:{{catColor}}">{{category.icon}} {{category.name}}</text>
+      <text class="{{book.extracted ? 'badge-done' : 'badge-pending'}}" style="margin-left:10rpx">
+        {{book.extracted ? '✓ 已榨取' : '⏳ 待榨取'}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 内容简介 -->
+  <view wx:if="{{summaryNodes}}" class="para">
+    <rich-text nodes="{{summaryNodes}}"></rich-text>
+  </view>
+
+  <!-- 核心命题 -->
+  <view wx:if="{{coreThesisNodes}}" class="section">
+    <view class="section-title"><text class="accent-bar"></text>核心命题</view>
+    <view class="blockquote"><rich-text nodes="{{coreThesisNodes}}"></rich-text></view>
+  </view>
+
+  <!-- 知识点 -->
+  <view wx:if="{{kpByLevel.length}}" class="section">
+    <view class="section-title"><text class="accent-bar"></text>知识点</view>
+    <view wx:for="{{kpByLevel}}" wx:key="level" class="level-group">
+      <view class="level-head" style="color:{{item.color}}">
+        <text class="level-dot" style="background:{{item.color}}"></text>{{item.level}}
+      </view>
+      <view wx:for="{{item.list}}" wx:for-item="kp" wx:key="concept" class="kp-card">
+        <text class="kp-level" style="background:{{item.color}}">{{item.level}}</text>
+        <view class="kp-concept">{{kp.concept}}</view>
+        <view class="kp-detail"><rich-text nodes="{{kp.detailNodes}}"></rich-text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 可行动洞察 -->
+  <view wx:if="{{actionable.length}}" class="section">
+    <view class="section-title"><text class="accent-bar"></text>可行动洞察</view>
+    <view class="list">
+      <view wx:for="{{actionable}}" wx:key="index" class="list-item">
+        <text class="bullet">▹</text>
+        <view class="list-body"><rich-text nodes="{{item}}"></rich-text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 金句 -->
+  <view wx:if="{{quotesNodes.length}}" class="section">
+    <view class="section-title"><text class="accent-bar"></text>金句</view>
+    <view wx:for="{{quotesNodes}}" wx:key="index" class="blockquote" style="margin-bottom:16rpx">
+      <rich-text nodes="{{item}}"></rich-text>
+    </view>
+  </view>
+
+  <!-- 关联书目 -->
+  <view wx:if="{{relatedBooks.length}}" class="section">
+    <view class="section-title"><text class="accent-bar"></text>关联书目</view>
+    <view class="grid">
+      <view wx:for="{{relatedBooks}}" wx:key="id" class="grid-item">
+        <book-card book="{{item}}" category="{{item.category}}" bind:tap="onCardTap" />
+      </view>
+    </view>
+  </view>
+
+  <view style="height:140rpx"></view>
+</view>
+
+<!-- 底部操作栏 -->
+<view class="action-bar">
+  <view class="shelf-btn {{inShelf ? 'shelf-on':''}}" bindtap="toggleShelf">
+    {{inShelf ? '✓ 已在书架' : '+ 加入书架'}}
+  </view>
+  <view class="read-btn btn-primary" bindtap="startReading">开始阅读</view>
+</view>

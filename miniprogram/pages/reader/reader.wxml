@@ -1,0 +1,61 @@
+<view class="reader-root theme-{{theme}}">
+  <scroll-view
+    id="readerScroll"
+    class="reader-scroll"
+    scroll-y="true"
+    scroll-top="{{scrollTop}}"
+    scroll-into-view="{{scrollIntoView}}"
+    bindscroll="onScroll"
+  >
+    <view class="reader-inner">
+      <view class="reader-book-title">{{book.title}}</view>
+
+      <block wx:for="{{blocks}}" wx:key="key" wx:for-index="bi">
+        <view id="block-{{bi}}" class="r-block {{item.bookmarked ? 'bm' : ''}}">
+          <view class="r-block-head">
+            <text class="r-type-label">{{item.title}}</text>
+            <view
+              class="bm-btn {{item.bookmarked ? 'bm-on' : ''}}"
+              catchtap="toggleBookmark"
+              data-key="{{item.key}}"
+              data-title="{{item.title}}"
+            >★</view>
+          </view>
+          <view wx:if="{{item.type === 'kp'}}" class="kp-tag" style="background:{{item.color}}">{{item.level}}</view>
+          <view class="r-body" style="font-size:{{fontSize}}px;line-height:{{lineHeight}}">
+            <rich-text nodes="{{item.nodes}}"></rich-text>
+          </view>
+        </view>
+      </block>
+
+      <view style="height:60rpx"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部控制栏 -->
+  <view class="reader-bar">
+    <view class="bar-btn" bindtap="decFont">A−</view>
+    <view class="bar-font">{{fontSize}}</view>
+    <view class="bar-btn" bindtap="incFont">A＋</view>
+    <view class="bar-progress">{{percent}}%</view>
+    <view class="bar-btn" bindtap="toggleTheme">{{theme === 'dark' ? '☀' : '☾'}}</view>
+    <view class="bar-btn bm-list" bindtap="openBmPanel">★ {{bookmarkCount}}</view>
+  </view>
+
+  <!-- 书签面板 -->
+  <view wx:if="{{showBmPanel}}" class="bm-mask" bindtap="closeBmPanel">
+    <view class="bm-panel" catchtap="noop">
+      <view class="bm-panel-head">
+        <text>书签（{{bookmarkCount}}）</text>
+        <text class="bm-close" bindtap="closeBmPanel">✕</text>
+      </view>
+      <view wx:if="{{bmList.length}}" class="bm-scroll">
+        <view wx:for="{{bmList}}" wx:key="key" class="bm-item" bindtap="jumpToBm" data-index="{{item.index}}">
+          <text class="bm-dot">★</text>
+          <text class="bm-text">{{item.title}}</text>
+        </view>
+      </view>
+      <view wx:else class="empty"><text>还没有书签，点击段落右侧 ★ 即可添加</text></view>
+    </view>
+  </view>
+</view>

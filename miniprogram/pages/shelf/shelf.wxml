@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="shelf-head">我的书架 · {{items.length}} 本</view>
+
+  <block wx:if="{{items.length}}">
+    <view wx:for="{{items}}" wx:key="id" class="shelf-item" bindtap="open" data-id="{{item.id}}">
+      <view class="shelf-info">
+        <view class="shelf-title">{{item.title}}</view>
+        <view class="shelf-meta">
+          <text style="color:{{item.catColor}}">{{item.catIcon}} {{item.catName}}</text>
+          <text class="dim"> · {{item.author}} · {{item.year}}</text>
+        </view>
+        <view class="bar">
+          <view class="bar-fill" style="width:{{item.percent}}%"></view>
+        </view>
+        <view class="shelf-foot">
+          <text class="dim">已读 {{item.percent}}%</text>
+          <text class="dim" wx:if="{{item.updatedAt}}">· {{item.updatedAt}}</text>
+        </view>
+      </view>
+      <view class="shelf-actions">
+        <view class="read-now">继续读</view>
+        <view class="remove-btn" catchtap="remove" data-id="{{item.id}}">✕</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty">
+    <text class="empty-title">书架还是空的</text>
+    <text>去书库挑几本，加入书架后这里会显示阅读进度</text>
+    <view class="go-books btn-ghost" bindtap="goBooks">去书库逛逛 →</view>
+  </view>
+</view>
