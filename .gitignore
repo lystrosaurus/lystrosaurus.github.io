@@ -1,6 +1,5 @@
 # Build output
 dist/
-dist-static/
 .astro/
 
 # Dependencies

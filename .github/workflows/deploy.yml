@@ -30,13 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static site (no Cloudflare adapter)
-        run: npm run gen:books && npx astro build --config astro.config.static.mjs
+      - name: Build static site
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist-static
+          path: dist
 
   deploy:
     needs: build
