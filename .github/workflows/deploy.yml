@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -7,19 +7,19 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: deploy
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  # ----------------------------------------------------------------
-  # 静态产物（GitHub Pages / Vercel）：不含 Cloudflare adapter，平铺 HTML
-  # ----------------------------------------------------------------
-  build-static:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,27 +30,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static (GitHub Pages / Vercel)
+      - name: Build static site (no Cloudflare adapter)
         run: npm run gen:books && npx astro build --config astro.config.static.mjs
 
-      - name: Upload GitHub Pages artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist-static
 
-      - name: Upload Vercel artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: static-site
-          path: dist-static
-          if-no-files-found: error
-
-  deploy-github-pages:
-    needs: build-static
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -58,52 +48,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  deploy-vercel:
-    needs: build-static
-    runs-on: ubuntu-latest
-    if: ${{ secrets.VERCEL_TOKEN != '' }}
-    environment:
-      name: vercel
-    steps:
-      - name: Download static artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: static-site
-          path: dist-static
-
-      - name: Deploy to Vercel
-        run: npx vercel deploy --prebuilt --prod dist-static --token "$VERCEL_TOKEN" --yes
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-  # ----------------------------------------------------------------
-  # Cloudflare（Workers / SSR）：带 adapter，产物为 dist/（server + client）
-  # ----------------------------------------------------------------
-  deploy-cloudflare:
-    runs-on: ubuntu-latest
-    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
-    environment:
-      name: cloudflare
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build with Cloudflare adapter
-        run: npm run build
-
-      - name: Deploy to Cloudflare
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
